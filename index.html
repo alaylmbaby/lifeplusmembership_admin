@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIFEPLUS 63 · Admin Console</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C1C1E; --ink2:#57504A; --ink3:#938B82;
+    --bg:#F4F1EC; --surface:#FFFFFF; --surface2:#FBF9F5;
+    --line:#E9E3D9; --line2:#F0ECE4;
+    --gold:#A9803F; --gold-soft:#C9A35A; --gold-bg:#F6EEDD;
+    --side:#1E1B18; --side2:#26221E; --side-line:#34302A; --side-txt:#A9A099; --side-txt2:#6F675F;
+    --green:#3C7A4E; --green-bg:#E7F1E9; --red:#A8443B; --red-bg:#F6E7E4; --blue:#3E5C86; --blue-bg:#E8EDF5;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(28,28,30,.04), 0 8px 24px -12px rgba(28,28,30,.12);
+    font-family:'Pretendard',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;display:flex;overflow:hidden}
+  ::selection{background:var(--gold-bg)}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#d9d2c6;border-radius:9px;border:2px solid var(--bg)}
+  .num{font-family:'Space Grotesk',sans-serif;font-feature-settings:"tnum"}
+  .serif{font-family:'Fraunces',serif}
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{width:264px;flex-shrink:0;background:var(--side);height:100vh;display:flex;flex-direction:column;color:var(--side-txt);position:relative}
+  .sidebar::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 60% at 0% 0%,rgba(201,163,90,.10),transparent 60%)}
+  .brand{padding:22px 22px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--side-line);position:relative;z-index:1}
+  .brand-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(150deg,#C9A35A,#8a6526);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px -4px rgba(201,163,90,.5)}
+  .brand-mark span{font-family:'Fraunces',serif;font-weight:600;font-size:19px;color:#231d12;line-height:1}
+  .brand-txt b{display:block;color:#F3EEE6;font-size:14px;font-weight:600;letter-spacing:.2px}
+  .brand-txt small{color:var(--side-txt2);font-size:11px;letter-spacing:.6px;text-transform:uppercase;font-family:'Space Grotesk'}
+
+  .nav{flex:1;overflow-y:auto;padding:14px 12px 24px;position:relative;z-index:1}
+  .nav::-webkit-scrollbar-thumb{background:#3a352e}
+  .nav-group{margin-bottom:4px}
+  .nav-cap{font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--side-txt2);padding:14px 12px 7px;font-weight:600}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--side-txt);transition:.15s;position:relative;user-select:none}
+  .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke-width:1.7;opacity:.85}
+  .nav-item:hover{background:var(--side2);color:#ECE6DD}
+  .nav-item.active{background:linear-gradient(100deg,rgba(201,163,90,.16),rgba(201,163,90,.04));color:#F6EEDD}
+  .nav-item.active::before{content:"";position:absolute;left:-12px;top:7px;bottom:7px;width:3px;border-radius:0 3px 3px 0;background:var(--gold-soft)}
+  .nav-item .badge{margin-left:auto;background:#3a342c;color:#d6c9a8;font-size:10.5px;font-family:'Space Grotesk';font-weight:600;padding:1px 7px;border-radius:99px}
+  .nav-item.active .badge{background:rgba(201,163,90,.25);color:#F0DBA8}
+
+  .side-foot{padding:14px 16px;border-top:1px solid var(--side-line);display:flex;align-items:center;gap:11px;position:relative;z-index:1}
+  .side-foot .av{width:34px;height:34px;border-radius:9px;background:#332e28;display:flex;align-items:center;justify-content:center;font-size:13px;color:#d6c9a8;font-weight:600}
+  .side-foot b{font-size:12.5px;color:#E6DFD5;display:block}
+  .side-foot small{font-size:11px;color:var(--side-txt2)}
+
+  /* ===== MAIN ===== */
+  .main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .topbar{height:64px;flex-shrink:0;background:rgba(255,255,255,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 28px}
+  .crumb{font-size:13px;color:var(--ink3)}
+  .crumb b{color:var(--ink);font-weight:600}
+  .search{margin-left:8px;flex:1;max-width:380px;position:relative}
+  .search input{width:100%;border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:9px 12px 9px 36px;font-size:13px;font-family:inherit;color:var(--ink);outline:none;transition:.15s}
+  .search input:focus{border-color:var(--gold-soft);background:#fff;box-shadow:0 0 0 3px var(--gold-bg)}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--ink3)}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .branch-sel{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:500;cursor:pointer}
+  .branch-sel .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .icn-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+  .icn-btn svg{width:18px;height:18px;stroke:var(--ink2)}
+  .icn-btn .dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+
+  .canvas{flex:1;overflow-y:auto;padding:28px}
+  .page{display:none;animation:fade .4s ease both}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:20px;flex-wrap:wrap}
+  .ph h1{font-family:'Fraunces',serif;font-weight:500;font-size:28px;letter-spacing:-.4px;line-height:1.1}
+  .ph p{font-size:13.5px;color:var(--ink3);margin-top:6px}
+  .ph .actions{display:flex;gap:9px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;color:var(--ink);transition:.15s;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:#d6cdbe;background:var(--surface2)}
+  .btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.9}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#000}
+  .btn.gold{background:linear-gradient(120deg,#B8924A,#8a6526);color:#fff;border:none;box-shadow:0 4px 14px -5px rgba(169,128,63,.6)}
+
+  /* cards / kpi */
+  .grid{display:grid;gap:16px}
+  .k4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+  .kpi .lbl{font-size:12.5px;color:var(--ink3);display:flex;align-items:center;gap:8px;font-weight:500}
+  .kpi .ico{width:30px;height:30px;border-radius:9px;background:var(--gold-bg);display:flex;align-items:center;justify-content:center}
+  .kpi .ico svg{width:16px;height:16px;stroke:var(--gold);stroke-width:1.9}
+  .kpi .val{font-family:'Space Grotesk';font-size:30px;font-weight:600;letter-spacing:-.5px;margin-top:14px;line-height:1}
+  .kpi .val small{font-size:14px;color:var(--ink3);font-weight:500}
+  .kpi .delta{font-size:12px;margin-top:9px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+  .delta.up{color:var(--green)} .delta.dn{color:var(--red)}
+  .delta .pill{background:var(--green-bg);padding:2px 7px;border-radius:99px;font-family:'Space Grotesk'}
+  .delta.dn .pill{background:var(--red-bg);color:var(--red)}
+
+  .sec-title{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+  .sec-title a{font-size:12.5px;color:var(--gold);font-weight:500;cursor:pointer;text-decoration:none}
+
+  /* bar chart */
+  .bars{display:flex;align-items:flex-end;gap:10px;height:160px;padding-top:10px}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+  .bar{width:100%;max-width:34px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,#D7BE8C,#B8924A);transition:.4s}
+  .bar.muted{background:linear-gradient(180deg,#EDE6D8,#DCD2BF)}
+  .bar-col small{font-size:11px;color:var(--ink3);font-family:'Space Grotesk'}
+
+  /* lists */
+  .feed-item{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line2)}
+  .feed-item:last-child{border-bottom:none}
+  .feed-ic{width:36px;height:36px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .feed-ic svg{width:17px;height:17px;stroke:var(--ink2);stroke-width:1.8}
+  .feed-bd{flex:1;min-width:0}
+  .feed-bd b{font-size:13.5px;font-weight:600;display:block}
+  .feed-bd small{font-size:12px;color:var(--ink3)}
+  .feed-amt{font-family:'Space Grotesk';font-weight:600;font-size:14px;color:var(--gold)}
+
+  /* table */
+  .tbl-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .tbl-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--ink2)}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--line)}
+  tbody td{padding:13px 18px;border-bottom:1px solid var(--line2);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr{transition:.12s;cursor:pointer}
+  tbody tr:hover{background:var(--surface2)}
+  .uid{font-family:'Space Grotesk';font-size:12px;color:var(--ink3)}
+  .uname{font-weight:600}
+  .av-sm{width:30px;height:30px;border-radius:8px;background:var(--gold-bg);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin-right:9px;vertical-align:middle}
+  .tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;font-family:'Space Grotesk'}
+  .tag.floor{background:var(--ink);color:#F0DBA8}
+  .tag.green{background:var(--green-bg);color:var(--green)}
+  .tag.red{background:var(--red-bg);color:var(--red)}
+  .tag.blue{background:var(--blue-bg);color:var(--blue)}
+  .tag.gold{background:var(--gold-bg);color:var(--gold)}
+  .tag.gray{background:#EFEBE3;color:var(--ink2)}
+  .gold-amt{font-family:'Space Grotesk';font-weight:600}
+
+  /* coupon cards */
+  .cpn{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;position:relative}
+  .cpn-badge{width:74px;flex-shrink:0;background:linear-gradient(150deg,#2a2520,#1b1714);color:#F0DBA8;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:14px;letter-spacing:.5px}
+  .cpn-bd{padding:14px 16px;flex:1}
+  .cpn-bd .store{font-size:11.5px;color:var(--ink3);font-weight:500}
+  .cpn-bd .nm{font-weight:600;font-size:14px;margin:3px 0 8px}
+  .cpn-bd .meta{display:flex;gap:8px;align-items:center}
+  .mini{font-size:11.5px;color:var(--ink3)}
+
+  .two{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .stub{padding:60px 30px;text-align:center;color:var(--ink3)}
+  .stub .big{width:60px;height:60px;border-radius:16px;background:var(--gold-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+  .stub .big svg{width:28px;height:28px;stroke:var(--gold);stroke-width:1.6}
+  .stub h3{font-family:'Fraunces',serif;font-weight:500;font-size:20px;color:var(--ink);margin-bottom:8px}
+  .seg{display:inline-flex;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:500;padding:6px 14px;border-radius:7px;cursor:pointer;color:var(--ink2)}
+  .seg button.on{background:#fff;box-shadow:var(--shadow);color:var(--ink)}
+  .progress{height:8px;border-radius:99px;background:var(--line2);overflow:hidden;margin-top:6px}
+  .progress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#C9A35A,#A9803F)}
+  .dt{border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:7px 10px;font-size:12.5px;font-family:inherit;color:var(--ink);outline:none}
+  .dt:focus{border-color:var(--gold-soft);background:#fff;box-shadow:0 0 0 3px var(--gold-bg)}
+  .tgl{position:relative;display:inline-block;width:42px;height:24px;cursor:pointer;vertical-align:middle}
+  .tgl input{opacity:0;width:0;height:0;position:absolute}
+  .tgl .track{position:absolute;inset:0;background:#D8D1C6;border-radius:99px;transition:.2s}
+  .tgl .knob{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .tgl input:checked + .track{background:linear-gradient(120deg,#B8924A,#8a6526)}
+  .tgl input:checked + .track + .knob{transform:translateX(18px)}
+  .tgl-lbl{font-size:11px;font-family:'Space Grotesk';font-weight:600;margin-left:8px;color:var(--ink3);vertical-align:middle}
+  .tgl-lbl.on{color:var(--gold)}
+  .refresh-btn{margin-left:8px;width:24px;height:24px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;vertical-align:middle;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .refresh-btn svg{width:13px;height:13px;stroke:var(--ink2)}
+  .refresh-btn:hover{border-color:var(--gold-soft);background:var(--gold-bg)}
+  .refresh-btn:hover svg{stroke:var(--gold)}
+  .refresh-btn.spin svg{animation:spin .65s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .btn.spinning svg{animation:spin .7s linear infinite}
+  .btn.spinning{pointer-events:none;opacity:.7}
+  .pg-foot{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface2)}
+  .pg-btn,.pg-num{min-width:32px;height:32px;border:1px solid var(--line);background:#fff;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;transition:.12s}
+  .pg-btn svg{width:15px;height:15px;stroke:var(--ink2)}
+  .pg-num:hover,.pg-btn:hover:not([disabled]){border-color:var(--gold-soft);background:var(--gold-bg);color:var(--gold)}
+  .pg-num.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pg-btn[disabled]{opacity:.35;cursor:not-allowed}
+  .filter-card{margin-bottom:16px;padding:16px 18px}
+  .filter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px}
+  .ff{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .ff>label{font-size:11.5px;font-weight:600;color:var(--ink2)}
+  .finput,.fsel{border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--ink);outline:none;width:100%}
+  .finput:focus,.fsel:focus{border-color:var(--gold-soft);background:#fff;box-shadow:0 0 0 3px var(--gold-bg)}
+  .frange{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3)}
+  .frange input{flex:1;min-width:0}
+  .filter-actions{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-top:14px}
+  @media(max-width:1100px){.filter-grid{grid-template-columns:repeat(2,1fr)}}
+  .modal-overlay{position:fixed;inset:0;background:rgba(28,25,22,.45);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;width:80vw;max-width:1100px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 30px 80px -20px rgba(0,0,0,.45);animation:pop .22s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+  .modal-head{padding:20px 22px 6px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .modal-head h3{font-family:'Fraunces',serif;font-weight:500;font-size:21px;line-height:1.15}
+  .modal-head p{font-size:12.5px;color:var(--ink3);margin-top:5px}
+  .modal-x{border:none;background:none;font-size:20px;color:var(--ink3);cursor:pointer;line-height:1;padding:2px 4px}
+  .modal-body{padding:14px 22px;overflow:auto}
+  .modal-foot{padding:14px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px;flex-shrink:0}
+  .lock{width:56px;height:56px;border-radius:15px;background:var(--gold-bg);display:flex;align-items:center;justify-content:center;margin:8px auto 14px}
+  .lock svg{width:26px;height:26px;stroke:var(--gold);stroke-width:1.8}
+  .warn{background:var(--red-bg);border:1px solid #eccfca;color:#8a3a31;border-radius:10px;padding:10px 12px;font-size:12.5px;display:flex;gap:8px;align-items:flex-start;margin-bottom:14px}
+  .mlabel{font-size:11.5px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px}
+  .err{color:var(--red);font-size:12px;margin-top:8px;min-height:16px}
+  .target-box{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+
+  @media(max-width:1100px){.k4{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}}
+  @media(max-width:820px){.sidebar{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark"><span>63</span></div>
+    <div class="brand-txt"><b>LIFEPLUS 63</b><small>Admin Console</small></div>
+  </div>
+  <nav class="nav" id="nav">
+    <div class="nav-cap">운영</div>
+    <div class="nav-item active" data-page="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>대시보드</div>
+
+    <div class="nav-cap">회원 · 멤버십</div>
+    <div class="nav-item" data-page="members"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>회원 관리<span class="badge">12,840</span></div>
+    <div class="nav-item" data-page="grade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l2.4 5 5.6.8-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.6-.8z"/></svg>멤버십 · 등급 정책</div>
+    <div class="nav-item" data-page="gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4.5a1.5 1.5 0 0 1 0 3H9h5a1.5 1.5 0 0 1 0 3H9"/></svg>골드 관리</div>
+
+    <div class="nav-cap">혜택 · 참여</div>
+    <div class="nav-item" data-page="coupon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg>쿠폰 관리<span class="badge">38</span></div>
+    <div class="nav-item" data-page="event"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>이벤트 관리<span class="badge">4</span></div>
+    <div class="nav-item" data-page="mission"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 3v18"/><path d="M5 4h11l-1.5 3.5L16 11H5"/></svg>미션 관리<span class="badge">1</span></div>
+
+    <div class="nav-cap">매장 · 콘텐츠</div>
+    <div class="nav-item" data-page="store"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>매장 관리</div>
+    <div class="nav-item" data-page="content"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v12H5.5L4 18z"/><path d="M8 9h8M8 12h5"/></svg>콘텐츠 · 알림</div>
+    <div class="nav-item" data-page="inquiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-3.3A8.4 8.4 0 1 1 21 11.5z"/></svg>1:1 문의<span class="badge">7</span></div>
+
+    <div class="nav-cap">분석 · 시스템</div>
+    <div class="nav-item" data-page="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-5"/></svg>통계 · 리포트</div>
+    <div class="nav-item" data-page="system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.8 7.8 0 0 0 0-2l1.7-1.3-1.8-3.1-2 .8a7.8 7.8 0 0 0-1.8-1l-.3-2.1H9.6l-.3 2.1a7.8 7.8 0 0 0-1.8 1l-2-.8L3.7 9.7 5.4 11a7.8 7.8 0 0 0 0 2l-1.7 1.3 1.8 3.1 2-.8a7.8 7.8 0 0 0 1.8 1l.3 2.1h4.8l.3-2.1a7.8 7.8 0 0 0 1.8-1l2 .8 1.8-3.1z"/></svg>시스템 · 운영</div>
+  </nav>
+  <div class="side-foot">
+    <div class="av">관</div>
+    <div><b>김운영</b><small>최고 관리자</small></div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<div class="main">
+  <header class="topbar">
+    <div class="crumb">LIFEPLUS 63 · <b id="crumb">대시보드</b></div>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input placeholder="회원번호, 이름, 쿠폰 검색…"></div>
+    <div class="top-right">
+      <div class="branch-sel"><span class="dot"></span>63빌딩 본점 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#57504A" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+      <div class="icn-btn"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+    </div>
+  </header>
+
+  <div class="canvas">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="page active" id="page-dash">
+      <div class="ph">
+        <div><h1>대시보드</h1><p>2026년 6월 1일 (월) · 적립 데이터 전일까지 집계 · 증감은 전일(5/31) 대비 일간(Daily) 기준</p></div>
+        <div class="actions"><button class="btn"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>리포트 내보내기</button></div>
+      </div>
+
+      <div class="grid k4" style="margin-bottom:16px">
+        <div class="card kpi"><div class="lbl"><span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>총 회원</div><div class="val num">12,840</div><div class="delta up"><span class="pill">▲ 42명</span></div></div>
+        <div class="card kpi"><div class="lbl"><span class="ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/></svg></span>어제 적립 골드 (5/31)</div><div class="val num">168,540<small> G</small></div><div class="delta up"><span class="pill">▲ 16,700G</span></div></div>
+        <div class="card kpi"><div class="lbl"><span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>쿠폰 사용률</div><div class="val num">63.4<small> %</small></div><div class="delta up"><span class="pill">▲ 2.1%</span> 발급 대비</div></div>
+        <div class="card kpi"><div class="lbl"><span class="ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>미션 참여(어제)</div><div class="val num">3,182</div><div class="delta dn"><span class="pill">▼ 26회</span></div></div>
+      </div>
+
+      <div class="two" style="margin-bottom:16px">
+        <div class="card">
+          <div class="sec-title"><span id="chartTitle">최근 30일 골드 적립 추이</span>
+            <span style="display:flex;gap:8px;align-items:center">
+              <span class="seg" id="chartPeriodSeg"><button class="on" data-cperiod="day">일</button><button data-cperiod="week">주</button><button data-cperiod="month">월</button><button data-cperiod="range">기간</button></span>
+              <span class="seg" id="chartSeg"><button class="on" data-chart="gold">골드</button><button data-chart="member">회원</button></span>
+            </span>
+          </div>
+          <div id="chartRangeBox" style="display:none;gap:8px;align-items:center;margin:2px 0 6px"><input type="date" id="chartFrom" class="dt" value="2026-05-17"><span>~</span><input type="date" id="chartTo" class="dt" value="2026-05-31"><span class="mini">최대 5/31</span></div>
+          <p class="mini" id="chartSub" style="margin:-6px 0 6px">전일(5/31)까지 집계</p>
+          <div id="trendChart" style="margin-top:4px"></div>
+        </div>
+        <div class="card">
+          <div class="sec-title">기간별 골드 적립 <span class="seg" id="feedSeg"><button class="on" data-period="day">일</button><button data-period="week">주</button><button data-period="month">월</button><button data-period="custom">기간</button></span></div>
+          <div id="feedCustom" style="display:none;align-items:center;gap:8px;margin:0 0 10px;flex-wrap:wrap">
+            <input type="date" id="feedFrom" min="2024-01-01" max="2026-05-31" value="2026-05-01" class="dt">
+            <span class="mini">~</span>
+            <input type="date" id="feedTo" min="2024-01-01" max="2026-05-31" value="2026-05-31" class="dt">
+            <button class="btn" id="feedApply" style="padding:7px 14px">조회</button>
+          </div>
+          <p class="mini" id="feedRange" style="margin:-6px 0 8px">전일까지 집계 · 어제 (5/31)</p>
+          <div id="feedBody"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:13px;border-top:1px solid var(--line)">
+            <span style="font-size:13px;font-weight:600">합계</span>
+            <span class="feed-amt" id="feedTotal" style="font-size:16px">+168,540G</span>
+          </div>
+          <a onclick="go('gold')" style="display:inline-block;margin-top:12px;font-size:12.5px;color:var(--gold);cursor:pointer;text-decoration:none">누적 원장 전체보기 ›</a>
+        </div>
+      </div>
+
+      <div class="three">
+        <div class="card" onclick="go('inquiry')" style="cursor:pointer"><div class="sec-title">처리 대기 1:1 문의 <span style="font-size:12.5px;color:var(--gold)">바로가기 ›</span></div><div style="font-family:'Space Grotesk';font-size:34px;font-weight:600">7<span style="font-size:14px;color:var(--ink3)"> 건</span></div><p class="mini" style="margin-top:6px">평균 응답 2.4시간</p></div>
+        <div class="card"><div class="sec-title">이상 적립 탐지</div><div style="font-family:'Space Grotesk';font-size:34px;font-weight:600;color:var(--red)">2<span style="font-size:14px;color:var(--ink3)"> 건</span></div><p class="mini" style="margin-top:6px">검토 필요 · 자동 보류됨</p></div>
+        <div class="card" onclick="go('event')" style="cursor:pointer"><div class="sec-title">진행 중 이벤트 <span style="font-size:12.5px;color:var(--gold)">바로가기 ›</span></div><div style="font-family:'Space Grotesk';font-size:34px;font-weight:600">4<span style="font-size:14px;color:var(--ink3)"> 개</span></div><p class="mini" style="margin-top:6px">부스팅 · 친구초대 외</p></div>
+      </div>
+    </section>
+
+    <!-- ===== MEMBERS ===== -->
+    <section class="page" id="page-members">
+      <div class="ph">
+        <div><h1>회원 관리</h1><p>전체 12,840명 · 활성 9,612명</p></div>
+        <div class="actions"><span class="mini" id="memberSync" style="align-self:center">마지막 갱신 06:00:00</span><button class="btn" id="memberRefresh"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5"/></svg>층·등급 새로고침</button><button class="btn"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/></svg>CSV 내보내기</button></div>
+      </div>
+      <div class="card filter-card">
+        <div class="filter-grid">
+          <div class="ff"><label>이름</label><input id="fName" class="finput" placeholder="이름 (1자 이상)"></div>
+          <div class="ff"><label>회원번호</label><input id="fId" class="finput" placeholder="4자 이상 포함"></div>
+          <div class="ff"><label>전화번호 뒷자리</label><input id="fPhone" class="finput" maxlength="4" inputmode="numeric" placeholder="뒤 4자리"></div>
+          <div class="ff"><label>성별</label><select id="fGender" class="fsel"><option value="all">전체</option><option value="남">남</option><option value="여">여</option></select></div>
+          <div class="ff" style="grid-column:span 2"><label>현재 층 (범위)</label>
+            <div id="floorPresets" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px"><span class="chip active" data-fp="all">전체</span><span class="chip" data-fp="저층">저층 B3~27F</span><span class="chip" data-fp="중층">중층 28~50F</span><span class="chip" data-fp="고층">고층 51F~</span></div>
+            <div class="frange"><select id="fFloorMin" class="fsel"></select><span>~</span><select id="fFloorMax" class="fsel"></select></div>
+          </div>
+          <div class="ff" style="grid-column:span 2"><label>클래스 (복수 선택)</label><div id="classChips" data-multi style="display:flex;gap:7px;flex-wrap:wrap"><span class="chip active" data-st="all">전체</span><span class="chip" data-st="Ground">Ground</span><span class="chip" data-st="M-Class">M-Class</span><span class="chip" data-st="L-Class">L-Class</span><span class="chip" data-st="H-Class">H-Class</span></div></div>
+          <div class="ff"><label>누적 골드</label><div class="frange"><input id="fGoldMin" class="finput" type="number" placeholder="min"><span>~</span><input id="fGoldMax" class="finput" type="number" placeholder="max"></div></div>
+          <div class="ff"><label>가입일</label><div class="frange"><input id="fDateFrom" class="dt" type="date"><span>~</span><input id="fDateTo" class="dt" type="date"></div></div>
+          <div class="ff" style="grid-column:span 2"><label>상태 (복수 선택)</label><div id="memberChips" data-multi style="display:flex;gap:7px;flex-wrap:wrap"><span class="chip active" data-st="all">전체</span><span class="chip" data-st="활성">활성</span><span class="chip" data-st="휴면">휴면</span><span class="chip" data-st="정지">정지</span></div></div>
+        </div>
+        <div class="filter-actions">
+          <span class="mini">이름 1자↑ · 회원번호 4자↑ · 전화 뒷 4자리 · 포함 검색</span>
+          <span style="display:flex;gap:9px"><button class="btn" id="fReset">초기화</button><button class="btn primary" id="fSearch">검색</button></span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <span class="mini" id="memberCount">전체 회원</span>
+          <span style="margin-left:auto;display:flex;align-items:center;gap:8px"><span class="mini">정렬</span><select id="fSort" class="fsel" style="width:auto"><option value="recent">최신가입순</option><option value="gold">누적골드순</option><option value="name">가나다순</option></select></span>
+        </div>
+        <table>
+          <thead><tr><th>회원</th><th>회원번호</th><th>전화번호</th><th>생년월일</th><th>성별</th><th>현재 층</th><th>여정</th><th>연간 등급</th><th>예상 등급</th><th>누적 골드 (미션/매장)</th><th>보유 쿠폰</th><th>상태</th><th>가입일</th><th></th></tr></thead>
+          <tbody id="memberRows"></tbody>
+        </table>
+        <div class="pg-foot" id="pgMembers"></div>
+      </div>
+    </section>
+
+    <!-- ===== GRADE ===== -->
+    <section class="page" id="page-grade">
+      <div class="ph">
+        <div><h1>멤버십 · 등급 정책</h1><p>전 층(B3F~63F+) 골드 임계값과 Class를 설정합니다</p></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="sec-title" style="align-items:center">
+          <span>층(Floor) 등급 임계값 <span class="mini" id="gradeHint" style="font-weight:400">전 68개 층 · 누적 골드 도달 시 해당 층 등급</span></span>
+          <span style="display:flex;gap:8px">
+            <button class="btn" id="gradeEdit" style="padding:7px 12px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>수정</button>
+            <button class="btn" id="gradeCancel" style="padding:7px 12px;font-size:12px;display:none">취소</button>
+            <button class="btn primary" id="gradeSave" style="padding:7px 12px;font-size:12px;display:none">저장</button>
+          </span>
+        </div>
+        <div style="max-height:460px;overflow:auto;border:1px solid var(--line2);border-radius:10px">
+          <table>
+            <thead><tr><th style="position:sticky;top:0;z-index:1">층</th><th style="position:sticky;top:0;z-index:1">필요 누적 골드</th><th style="position:sticky;top:0;z-index:1">회원 수</th><th style="position:sticky;top:0;z-index:1">비고</th></tr></thead>
+            <tbody id="gradeRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title" style="align-items:center">
+          <span>Class 정의 <span class="mini" id="classHint" style="font-weight:400">등급별 혜택</span></span>
+          <span style="display:flex;gap:8px">
+            <button class="btn" id="classEdit" style="padding:7px 12px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>수정</button>
+            <button class="btn" id="classCancel" style="padding:7px 12px;font-size:12px;display:none">취소</button>
+            <button class="btn primary" id="classSave" style="padding:7px 12px;font-size:12px;display:none">저장</button>
+          </span>
+        </div>
+        <table>
+          <thead><tr><th>Class</th><th>등급별 혜택</th><th>회원</th></tr></thead>
+          <tbody id="classRows"></tbody>
+        </table>
+        <div style="margin-top:18px"><div class="sec-title" style="margin-bottom:4px">등급 산정 주기</div><p class="mini">매년 12/31 누적 골드 기준 · 익년 등급 산정 · 골드는 적립만(사용·소진·만료 없음)</p></div>
+      </div>
+    </section>
+
+    <!-- ===== GOLD ===== -->
+    <section class="page" id="page-gold">
+      <div class="ph">
+        <div><h1>골드 관리</h1><p>적립 규칙 · 수동 지급 이력 · 등급 산정 기준 (적립 전용 · 사용/만료 없음)</p></div>
+        <div class="actions"><button class="btn gold" id="openGrant">+ 수동 지급</button></div>
+      </div>
+      <div class="grid k4" style="margin-bottom:16px">
+        <div class="card kpi"><div class="lbl">올해 누적 적립 (2026)</div><div class="val num">48.2<small>M G</small></div></div>
+        <div class="card kpi"><div class="lbl">회원 평균 누적</div><div class="val num">3,755<small> G</small></div></div>
+        <div class="card kpi"><div class="lbl">최고 누적 회원</div><div class="val num">34,100<small> G</small></div></div>
+        <div class="card kpi"><div class="lbl">등급 산정까지 (12/31)</div><div class="val num">D-213</div></div>
+      </div>
+      <div class="card">
+          <div class="sec-title">적립 규칙</div>
+          <table>
+            <thead><tr><th>분류</th><th>적립 경로</th><th>보상</th><th>한도</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tag blue">미션</span></td><td>오프라인 결제</td><td class="gold-amt">결제액 1%</td><td class="mini">-</td><td><span class="tag green">ON</span></td></tr>
+              <tr><td><span class="tag blue">미션</span></td><td>창문 닦기</td><td class="gold-amt">+50 G</td><td class="mini">하루 5회</td><td><span class="tag green">ON</span></td></tr>
+              <tr><td><span class="tag gold">이벤트</span></td><td>친구 초대</td><td class="gold-amt">+10 G</td><td class="mini">월 3명</td><td><span class="tag green">ON</span></td></tr>
+              <tr><td><span class="tag gold">이벤트</span></td><td>웰컴 보너스</td><td class="gold-amt">+200 G</td><td class="mini">가입 1회</td><td><span class="tag green">ON</span></td></tr>
+              <tr><td><span class="tag gold">이벤트</span></td><td>이벤트 보너스</td><td class="gold-amt">가변</td><td class="mini">캠페인별</td><td><span class="tag gray">예약</span></td></tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="tbl-wrap" style="margin-top:16px">
+        <div class="tbl-top"><span style="font-weight:600;font-size:14px">수동 지급 이력</span><span style="margin-left:auto" class="mini">특별 지급 기록 · 감사 대상</span></div>
+        <table>
+          <thead><tr><th>일시</th><th>관리자</th><th>대상 조건</th><th>인원</th><th>1인당</th><th>총 지급</th><th>사유</th></tr></thead>
+          <tbody id="grantHistoryRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== COUPON ===== -->
+    <section class="page" id="page-coupon">
+      <div class="ph">
+        <div><h1>쿠폰 관리</h1><p>활성 38종 · 이번 달 발급 21,400장 · 만료 임박순</p></div>
+        <div class="actions"><button class="btn primary" id="openCoupon">+ 쿠폰 생성</button></div>
+      </div>
+      <div class="card filter-card">
+        <div class="filter-grid">
+          <div class="ff"><label>쿠폰명</label><input id="cqName" class="finput" placeholder="포함 검색"></div>
+          <div class="ff"><label>매장</label><input id="cqStore" class="finput" placeholder="매장명 포함"></div>
+          <div class="ff"><label>혜택 뱃지</label><select id="cqBadge" class="fsel"><option value="all">전체</option><option>1+1</option><option>2+1</option><option>FREE</option><option>GIFT</option><option>SIZE↑</option><option>5%</option><option>10%</option><option>15%</option><option>20%</option><option>30%</option></select></div>
+          <div class="ff"><label>상태</label><select id="cqStatus" class="fsel"><option value="all">전체</option><option>발급</option><option>만료</option></select></div>
+          <div class="ff"><label>만료일</label><div class="frange"><input id="cqExpFrom" class="dt" type="date"><span>~</span><input id="cqExpTo" class="dt" type="date"></div></div>
+          <div class="ff"><label>발급 수</label><div class="frange"><input id="cqIssMin" class="finput" type="number" placeholder="min"><span>~</span><input id="cqIssMax" class="finput" type="number" placeholder="max"></div></div>
+          <div class="ff"><label>사용 수</label><div class="frange"><input id="cqUseMin" class="finput" type="number" placeholder="min"><span>~</span><input id="cqUseMax" class="finput" type="number" placeholder="max"></div></div>
+        </div>
+        <div class="filter-actions">
+          <span class="mini">모든 조건은 AND로 결합 · 만료일은 기간 한정 쿠폰에만 적용</span>
+          <span style="display:flex;gap:9px"><button class="btn" id="cqReset">초기화</button><button class="btn primary" id="cqSearch">검색</button></span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <span class="mini" id="couponCount">쿠폰 목록</span>
+          <span style="margin-left:auto;display:flex;align-items:center;gap:8px"><span class="mini">정렬</span><select id="cqSort" class="fsel" style="width:auto"><option value="expiry">만료일순</option><option value="useHigh">사용률 높은순</option><option value="useLow">사용률 낮은순</option></select></span>
+        </div>
+        <table>
+          <thead><tr><th>혜택</th><th>매장</th><th>쿠폰명</th><th>만료</th><th>발급 / 사용 (사용률)</th><th>상태</th></tr></thead>
+          <tbody id="couponRows"></tbody>
+        </table>
+        <div class="pg-foot" id="pgCoupon"></div>
+      </div>
+    </section>
+
+    <!-- ===== MISSION ===== -->
+    <section class="page" id="page-event">
+      <div class="ph">
+        <div><h1>이벤트 관리</h1><p>전체 6개 · 진행중 4 · 예약 1 · 종료 1</p></div>
+        <div class="actions"><button class="btn primary">+ 이벤트 생성</button></div>
+      </div>
+      <div class="card filter-card">
+        <div class="filter-grid">
+          <div class="ff"><label>이벤트명</label><input id="eqName" class="finput" placeholder="포함 검색"></div>
+          <div class="ff"><label>매장</label><input id="eqStore" class="finput" placeholder="매장명 포함"></div>
+          <div class="ff"><label>유형</label><select id="eqType" class="fsel"><option value="all">전체</option><option>응모당첨형</option><option>선착순형</option><option>공지형</option></select></div>
+          <div class="ff"><label>상태</label><select id="eqStatus" class="fsel"><option value="all">전체</option><option>진행중</option><option>예약</option><option>종료</option></select></div>
+          <div class="ff"><label>노출 여부</label><select id="eqShow" class="fsel"><option value="all">전체</option><option>노출</option><option>비노출</option></select></div>
+          <div class="ff"><label>종료일</label><div class="frange"><input id="eqEndFrom" class="dt" type="date"><span>~</span><input id="eqEndTo" class="dt" type="date"></div></div>
+          <div class="ff"><label>참여자수</label><div class="frange"><input id="eqPartiMin" class="finput" type="number" placeholder="min"><span>~</span><input id="eqPartiMax" class="finput" type="number" placeholder="max"></div></div>
+        </div>
+        <div class="filter-actions">
+          <span class="mini">모든 조건은 AND로 결합 · 종료일은 기간 한정 이벤트에만 적용</span>
+          <span style="display:flex;gap:9px"><button class="btn" id="eqReset">초기화</button><button class="btn primary" id="eqSearch">검색</button></span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <span class="mini" id="eventCount">이벤트 목록</span>
+          <span style="margin-left:auto" class="mini">노출 토글은 앱 노출 여부입니다</span>
+        </div>
+        <table>
+          <thead><tr><th>이벤트명</th><th>유형</th><th>매장</th><th>시작일</th><th>종료일</th><th>참여자수</th><th>상태</th><th style="text-align:center">노출</th><th></th></tr></thead>
+          <tbody id="eventRows"></tbody>
+        </table>
+        <div class="pg-foot" id="pgEvents"></div>
+      </div>
+    </section>
+
+    <!-- ===== MISSION (미션 관리) ===== -->
+    <section class="page" id="page-mission">
+      <div class="ph">
+        <div><h1>미션 관리</h1><p>골드 적립 미션 · 1개 운영 중</p></div>
+        <div class="actions"><button class="btn primary">+ 미션 생성</button></div>
+      </div>
+      <div class="three">
+        <div class="card">
+          <div class="sec-title">창문 닦기 (스크래치) <span class="tag green">진행중</span></div>
+          <p class="mini">하루 최대 5장 · 회당 +50G</p>
+          <div class="progress" style="margin-top:10px"><i style="width:64%"></i></div>
+          <p class="mini" style="margin-top:8px">오늘 참여 3,182 / 일평균 4,950</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)">
+            <span><label class="tgl"><input type="checkbox" id="mTglWin" checked><span class="track"></span><span class="knob"></span></label><span class="tgl-lbl on" id="mLblWin">노출 ON</span></span>
+            <button class="btn" style="padding:6px 12px;font-size:12px">관리</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STORE ===== -->
+    <section class="page" id="page-store">
+      <div class="ph">
+        <div><h1>매장 관리</h1><p>63빌딩 본점 · GL · 57 · 58 · 59F 운영 · 입점 매장 11개</p></div>
+        <div class="actions"><button class="btn" onclick="go('storecat')">카테고리</button><button class="btn primary" onclick="openStoreNew()">+ 매장 등록</button></div>
+      </div>
+      <div class="card filter-card">
+        <div class="filter-grid">
+          <div class="ff"><label>매장명</label><input id="sqName" class="finput" placeholder="포함 검색"></div>
+          <div class="ff"><label>층</label><select id="sqFloor" class="fsel"><option value="all">전체</option><option>GL</option><option>57F</option><option>58F</option><option>59F</option></select></div>
+          <div class="ff"><label>카테고리</label><select id="sqCat" class="fsel"><option value="all">전체</option></select></div>
+          <div class="ff"><label>상태</label><select id="sqStatus" class="fsel"><option value="all">전체</option><option>영업중</option><option>휴무</option><option>오픈예정</option><option>영업 종료</option></select></div>
+          <div class="ff"><label>편의시설</label><select id="sqAmen" class="fsel"><option value="all">전체</option></select></div>
+          <div class="ff"><label>연결 쿠폰 수</label><div class="frange"><input id="sqCpMin" class="finput" type="number" placeholder="min"><span>~</span><input id="sqCpMax" class="finput" type="number" placeholder="max"></div></div>
+        </div>
+        <div class="filter-actions">
+          <span class="mini">모든 조건은 AND로 결합 · 편의시설은 해당 항목을 제공하는 매장</span>
+          <span style="display:flex;gap:9px"><button class="btn" id="sqReset">초기화</button><button class="btn primary" id="sqSearch">검색</button></span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top"><span class="mini" id="storeCount">매장 목록</span></div>
+        <table>
+          <thead><tr><th>매장</th><th>층</th><th>카테고리</th><th>영업시간</th><th>연결 쿠폰</th><th>상태</th><th></th></tr></thead>
+          <tbody id="storeRows"></tbody>
+        </table>
+        <div class="pg-foot" id="pgStore"></div>
+      </div>
+    </section>
+
+    <!-- ===== STORE CATEGORY (매장 카테고리 관리) ===== -->
+    <section class="page" id="page-storecat">
+      <div class="ph">
+        <div>
+          <button class="btn" onclick="go('store')" style="padding:5px 11px;font-size:12px;margin-bottom:8px">← 매장 관리</button>
+          <h1>매장 카테고리 관리</h1><p>카테고리를 등록하고, 각 매장 상세에서 분류를 매핑합니다</p>
+        </div>
+        <div class="actions"><button class="btn primary" id="catAdd">+ 카테고리 추가</button></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="sec-title">카테고리 추가</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div class="ff" style="flex:1;min-width:200px"><label>카테고리명</label><input id="catName" class="finput" placeholder="예: F&B"></div>
+          <div class="ff" style="width:160px"><label>태그 색상</label><select id="catColorSel" class="fsel"><option value="gray">기본(회색)</option><option value="blue">파랑</option><option value="gold">골드</option><option value="green">그린</option></select></div>
+          <button class="btn primary" id="catCreate" style="height:40px">추가</button>
+        </div>
+        <div class="err" id="catErr" style="margin-top:6px"></div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top"><span class="mini" id="catCount">카테고리 목록</span></div>
+        <table>
+          <thead><tr><th>카테고리</th><th>태그 색상</th><th>연결 매장 수</th><th></th></tr></thead>
+          <tbody id="catRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== CONTENT ===== -->
+    <section class="page" id="page-content">
+      <div class="ph">
+        <div><h1>콘텐츠 · 알림</h1><p>공지 · 배너 · 푸시 · FAQ · 약관</p></div>
+        <div class="actions"><button class="btn" id="openPush">+ 푸시 발송</button><button class="btn primary" id="openNotice">+ 공지 작성</button></div>
+      </div>
+      <div class="two">
+        <div class="card">
+          <div class="sec-title">공지사항 <span class="mini" id="noticeCnt"></span></div>
+          <div id="cmsNoticeList"></div>
+        </div>
+        <div class="card">
+          <div class="sec-title">푸시 알림</div>
+          <div id="pushList"></div>
+          <div style="margin-top:14px;display:flex;gap:10px"><span class="tag gray">FAQ 24</span><span class="tag gray">약관 v2.3</span><span class="tag gray" onclick="go('inquiry')" style="cursor:pointer">1:1 문의 7 ›</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INQUIRY (1:1 문의 관리) ===== -->
+    <section class="page" id="page-inquiry">
+      <div class="ph">
+        <div><h1>1:1 문의 관리</h1><p>전체 124건 · 답변 대기 7 · 오늘 접수 3</p></div>
+        <div class="actions"><button class="btn"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/></svg>CSV 내보내기</button></div>
+      </div>
+      <div class="grid k4" style="margin-bottom:16px">
+        <div class="card kpi"><div class="lbl">답변 대기</div><div class="val num" style="color:var(--red)">7<small> 건</small></div></div>
+        <div class="card kpi"><div class="lbl">오늘 접수</div><div class="val num">3<small> 건</small></div></div>
+        <div class="card kpi"><div class="lbl">평균 응답</div><div class="val num">2.4<small> 시간</small></div></div>
+        <div class="card kpi"><div class="lbl">답변완료율</div><div class="val num">92<small> %</small></div></div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top" id="inqChips">
+          <span class="chip active" data-st="all">전체</span>
+          <span class="chip" data-st="대기중">대기중 7</span>
+          <span class="chip" data-st="답변완료">답변완료</span>
+          <span class="chip" data-st="보류">보류</span>
+          <span style="margin-left:auto" class="mini">정렬: 접수 최신순</span>
+        </div>
+        <table>
+          <thead><tr><th>회원</th><th>유형</th><th>문의 내용</th><th>접수</th><th>상태</th><th></th></tr></thead>
+          <tbody id="inquiryRows"></tbody>
+        </table>
+        <div class="pg-foot" id="pgInquiry"></div>
+      </div>
+    </section>
+
+    <!-- ===== REPORT ===== -->
+    <section class="page" id="page-report">
+      <div class="ph"><div><h1>통계 · 리포트</h1><p>회원 · 골드 · 쿠폰 · 매장 성과</p></div></div>
+      <div class="stub card">
+        <div class="big"><svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-5"/></svg></div>
+        <h3>리포트 대시보드</h3>
+        <p>등급 분포 · 골드 누적 적립 추이 · 쿠폰 발급 대비 사용률 · 미션 참여율 · 매장별 성과를 차트로 제공할 영역입니다.</p>
+      </div>
+    </section>
+
+    <!-- ===== SYSTEM ===== -->
+    <section class="page" id="page-system">
+      <div class="ph"><div><h1>시스템 · 운영</h1><p>운영자 권한 · 감사 로그 · 앱 설정</p></div></div>
+      <div class="three">
+        <div class="card"><div class="sec-title">운영자 / 권한</div><p class="mini">최고관리자 1 · 운영자 4 · 매장담당 12</p></div>
+        <div class="card"><div class="sec-title">감사 로그</div><p class="mini">오늘 변경 38건 · 골드 수동지급 2건</p></div>
+        <div class="card"><div class="sec-title">앱 설정</div><p class="mini">버전 v1.0.0 · 스플래시 · 다국어(ko)</p></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ===== 골드 수동 지급 모달 ===== -->
+<div class="modal-overlay" id="grantModal">
+  <div class="modal">
+    <!-- STEP A: 대상 지정 + 지급 내역 -->
+    <div id="grantStep2">
+      <div class="modal-head"><div><h3>골드 수동 지급</h3><p>회원 검색 조건으로 대상을 지정한 뒤 지급 내역을 입력하세요.</p></div><button class="modal-x" onclick="closeGrant()">✕</button></div>
+      <div class="modal-body">
+        <label class="mlabel">대상 조건 (회원 검색과 동일)</label>
+        <div class="filter-grid" style="grid-template-columns:repeat(2,1fr);gap:10px 12px">
+          <div class="ff"><label>이름</label><input id="gName" class="finput" placeholder="1자 이상"></div>
+          <div class="ff"><label>회원번호</label><input id="gId" class="finput" placeholder="4자 이상"></div>
+          <div class="ff"><label>전화 뒷자리</label><input id="gPhone" class="finput" maxlength="4" placeholder="뒤 4자리"></div>
+          <div class="ff"><label>성별</label><select id="gGender" class="fsel"><option value="all">전체</option><option value="남">남</option><option value="여">여</option></select></div>
+          <div class="ff"><label>현재 층 범위</label><div class="frange"><select id="gFloorMin" class="fsel"></select><span>~</span><select id="gFloorMax" class="fsel"></select></div></div>
+          <div class="ff"><label>누적 골드</label><div class="frange"><input id="gGoldMin" class="finput" type="number" placeholder="min"><span>~</span><input id="gGoldMax" class="finput" type="number" placeholder="max"></div></div>
+          <div class="ff" style="grid-column:span 2"><label>가입일</label><div class="frange"><input id="gDateFrom" class="dt" type="date"><span>~</span><input id="gDateTo" class="dt" type="date"></div></div>
+          <div class="ff" style="grid-column:span 2"><label>클래스 (복수)</label><div id="gClassChips" data-multi style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip active" data-st="all">전체</span><span class="chip" data-st="Ground">Ground</span><span class="chip" data-st="M-Class">M-Class</span><span class="chip" data-st="L-Class">L-Class</span><span class="chip" data-st="H-Class">H-Class</span></div></div>
+          <div class="ff" style="grid-column:span 2"><label>상태 (복수)</label><div id="gStatusChips" data-multi style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip active" data-st="all">전체</span><span class="chip" data-st="활성">활성</span><span class="chip" data-st="휴면">휴면</span><span class="chip" data-st="정지">정지</span></div></div>
+        </div>
+        <div class="target-box"><span class="mini">조건에 맞는 대상</span><span><b id="gTargetCount" style="font-family:'Space Grotesk';font-size:18px">—</b> <button class="btn" id="gQuery" style="padding:6px 12px;font-size:12px;margin-left:8px">대상 조회</button></span></div>
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:12px;margin-top:14px">
+          <div><label class="mlabel">1인당 지급 골드</label><input id="gAmount" class="finput" type="number" min="1" placeholder="예: 500"></div>
+          <div><label class="mlabel">지급 사유 (필수)</label><input id="gReason" class="finput" placeholder="예: 서비스 장애 보상"></div>
+        </div>
+        <div class="err" id="grantErr"></div>
+      </div>
+      <div class="modal-foot"><button class="btn" onclick="closeGrant()">취소</button><button class="btn gold" id="grantRun">지급 실행</button></div>
+    </div>
+    <!-- STEP B: 최종 확인(경고 + 2중 보안 비밀번호) -->
+    <div id="grantStep1" style="display:none">
+      <div class="modal-head"><div><h3>지급 전 최종 확인</h3><p>2중 보안: 비밀번호를 입력해야 지급이 실행됩니다.</p></div><button class="modal-x" onclick="closeGrant()">✕</button></div>
+      <div class="modal-body">
+        <div class="warn"><span>⚠</span><span>특별 지급은 전액 골드로 적립되며 회수가 불가합니다. 대상과 금액을 다시 한 번 확인해 주세요.</span></div>
+        <div class="target-box" style="display:block">
+          <div style="display:flex;justify-content:space-between;padding:3px 0"><span class="mini">대상</span><b id="cfTarget" style="font-family:'Space Grotesk'">—</b></div>
+          <div style="display:flex;justify-content:space-between;padding:3px 0"><span class="mini">1인당</span><b class="gold-amt" id="cfPer">—</b></div>
+          <div style="display:flex;justify-content:space-between;padding:3px 0;border-top:1px solid var(--line);margin-top:4px;padding-top:8px"><span class="mini">총 지급</span><b class="gold-amt" id="cfTotal" style="font-size:16px">—</b></div>
+          <div style="display:flex;justify-content:space-between;padding:3px 0"><span class="mini">사유</span><span id="cfReason" class="mini" style="color:var(--ink)">—</span></div>
+        </div>
+        <div style="margin-top:14px"><label class="mlabel">관리자 비밀번호</label><input type="password" id="grantPw" class="finput" placeholder="비밀번호 입력" autocomplete="off"><div class="err" id="grantPwErr"></div><p class="mini">데모 비밀번호: <b>admin</b></p></div>
+      </div>
+      <div class="modal-foot"><button class="btn" id="grantBack">뒤로</button><button class="btn gold" id="grantPwOk">지급 실행</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 쿠폰 발급 모달 ===== -->
+<div class="modal-overlay" id="couponModal">
+  <div class="modal">
+    <div class="modal-head"><div><h3>쿠폰 발급</h3><p>모든 쿠폰은 매장을 반드시 지정해야 합니다. (매장 관리 등록 매장)</p></div><button class="modal-x" onclick="closeCoupon()">✕</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="grid-column:span 2"><label class="mlabel">매장 (필수)</label><select id="cpStore" class="fsel"></select></div>
+        <div style="grid-column:span 2"><label class="mlabel">쿠폰명 (필수)</label><input id="cpName" class="finput" placeholder="예: 아메리카노 1잔 무료"></div>
+        <div><label class="mlabel">혜택 뱃지</label><select id="cpBadge" class="fsel"><option>1+1</option><option>2+1</option><option>FREE</option><option>GIFT</option><option>SIZE↑</option><option>5%</option><option>10%</option><option>15%</option><option>20%</option><option>30%</option></select></div>
+        <div><label class="mlabel">사용 조건</label><input id="cpCond" class="finput" placeholder="사용 조건 추후 지정"></div>
+        <div><label class="mlabel">시작일</label><input id="cpFrom" class="dt" type="date"></div>
+        <div><label class="mlabel">종료일</label><input id="cpTo" class="dt" type="date"></div>
+        <div style="grid-column:span 2"><label class="mlabel">발급 수량 한도 (선택)</label><input id="cpLimit" class="finput" type="number" min="1" placeholder="미입력 시 무제한"></div>
+      </div>
+      <div class="err" id="cpErr"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeCoupon()">취소</button><button class="btn primary" id="cpCreate">발급</button></div>
+  </div>
+</div>
+
+<!-- ===== 매장 상세 관리 모달 (소개/메뉴/공지·안내) ===== -->
+<div class="modal-overlay" id="storeModal">
+  <div class="modal">
+    <div class="modal-head"><div><h3 id="smName">매장 관리</h3><p id="smSub">매장 상세 정보 등록 / 수정</p></div><button class="modal-x" onclick="closeStore()">✕</button></div>
+    <div style="padding:4px 22px 0"><div class="seg" id="smTabs"><button class="on" data-tab="intro">소개</button><button data-tab="menu">메뉴</button><button data-tab="notice">공지·안내</button></div></div>
+    <div class="modal-body">
+      <!-- 소개 -->
+      <div id="smTabIntro">
+        <div style="display:grid;grid-template-columns:1fr 110px 1fr;gap:12px">
+          <div><label class="mlabel">매장명</label><input id="smF_name" class="finput"></div>
+          <div><label class="mlabel">층</label><select id="smF_floor" class="fsel"><option>GL</option><option>57F</option><option>58F</option><option>59F</option></select></div>
+          <div><label class="mlabel">카테고리</label><select id="smF_cat" class="fsel"></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+          <div><label class="mlabel">영업시간</label><input id="smF_hours" class="finput" placeholder="11:00~22:00"></div>
+          <div><label class="mlabel">라스트오더</label><input id="smF_lo" class="finput" placeholder="21:00"></div>
+          <div><label class="mlabel">상태</label><select id="smF_status" class="fsel"><option>영업중</option><option>휴무</option><option>오픈예정</option><option>영업 종료</option></select></div>
+        </div>
+        <div style="margin-top:12px"><label class="mlabel">매장 소개</label><textarea id="smF_desc" class="finput" rows="3" style="resize:vertical"></textarea></div>
+        <div style="margin-top:14px"><label class="mlabel">편의시설 (선택 항목)</label><div id="smAmen" data-multi style="display:flex;gap:7px;flex-wrap:wrap"></div></div>
+      </div>
+      <!-- 메뉴 -->
+      <div id="smTabMenu" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="mlabel" style="margin:0">메뉴 항목</span><button class="btn" id="smMenuAdd" style="padding:6px 12px;font-size:12px">+ 항목 추가</button></div>
+        <div id="smMenuList"></div>
+      </div>
+      <!-- 공지·안내 -->
+      <div id="smTabNotice" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="mlabel" style="margin:0">공지 · 안내</span><button class="btn" id="smNoticeAdd" style="padding:6px 12px;font-size:12px">+ 공지 추가</button></div>
+        <div id="smNoticeList"></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeStore()">취소</button><button class="btn primary" id="smSave">저장</button></div>
+  </div>
+</div>
+
+<!-- ===== 푸시 발송 모달 ===== -->
+<div class="modal-overlay" id="pushModal">
+  <div class="modal">
+    <div class="modal-head"><div><h3>푸시 발송</h3><p>회원에게 앱 푸시 알림을 발송합니다.</p></div><button class="modal-x" onclick="closePush()">✕</button></div>
+    <div class="modal-body">
+      <div><label class="mlabel">제목 (필수)</label><input id="pgTitle" class="finput" placeholder="예: 오늘만 적립 2배!" maxlength="40"></div>
+      <div style="margin-top:12px"><label class="mlabel">내용 (필수)</label><textarea id="pgBody" class="finput" rows="3" style="resize:vertical" placeholder="푸시 본문을 입력하세요" maxlength="120"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div><label class="mlabel">발송 대상</label><select id="pgTarget" class="fsel"><option value="all">전체 회원</option><option value="활성">활성 회원</option><option value="휴면">휴면 회원</option><option value="L">L-Class 이상</option><option value="H">H-Class</option></select></div>
+        <div><label class="mlabel">랜딩 (딥링크)</label><select id="pgLink" class="fsel"><option value="">없음</option><option>골드</option><option>쿠폰</option><option>이벤트</option><option>매장</option></select></div>
+      </div>
+      <div class="target-box"><span class="mini">예상 도달</span><b id="pgReach" style="font-family:'Space Grotesk';font-size:18px">—</b></div>
+      <div style="margin-top:12px"><label class="mlabel">발송 시점</label>
+        <div style="display:flex;gap:14px;align-items:center;margin-bottom:8px"><label class="mini" style="display:flex;gap:5px;align-items:center"><input type="radio" name="pgWhen" value="now" checked> 즉시 발송</label><label class="mini" style="display:flex;gap:5px;align-items:center"><input type="radio" name="pgWhen" value="schedule"> 예약</label></div>
+        <input type="datetime-local" id="pgSchedule" class="dt" style="display:none">
+      </div>
+      <div class="err" id="pgErr"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closePush()">취소</button><button class="btn primary" id="pgSend">발송</button></div>
+  </div>
+</div>
+
+<!-- ===== 공지 작성 모달 ===== -->
+<div class="modal-overlay" id="noticeModal">
+  <div class="modal">
+    <div class="modal-head"><div><h3>공지 작성</h3><p>앱 공지사항을 등록합니다.</p></div><button class="modal-x" onclick="closeNotice()">✕</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 160px;gap:12px">
+        <div><label class="mlabel">제목 (필수)</label><input id="ntTitle" class="finput" placeholder="공지 제목"></div>
+        <div><label class="mlabel">분류</label><select id="ntCat" class="fsel"><option>공지</option><option>이벤트</option><option>점검</option><option>안내</option><option>휴무</option></select></div>
+      </div>
+      <div style="margin-top:12px"><label class="mlabel">내용 (필수)</label><textarea id="ntBody" class="finput" rows="4" style="resize:vertical" placeholder="공지 내용을 입력하세요"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+        <div><label class="mlabel">게시 시작일</label><input id="ntFrom" class="dt" type="date"></div>
+        <div><label class="mlabel">게시 종료일</label><input id="ntTo" class="dt" type="date"></div>
+        <div><label class="mlabel">상태</label><select id="ntStatus" class="fsel"><option>게시</option><option>예약</option><option>임시저장</option></select></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:18px;align-items:center">
+        <label class="mini" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ntPin"> 상단 고정</label>
+        <label class="mini" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ntAlways"> 상시 게시 (종료일 없음)</label>
+      </div>
+      <div class="err" id="ntErr"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeNotice()">취소</button><button class="btn primary" id="ntSave">저장</button></div>
+  </div>
+</div>
+
+<!-- ===== 회원 상세 모달 (골드 1개 → 목표 2개) ===== -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal">
+    <div class="modal-head"><div><h3 id="mmName">회원 상세</h3><p id="mmSub"></p></div><button class="modal-x" onclick="closeMember()">✕</button></div>
+    <div class="modal-body">
+      <div id="mmBasic" style="display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);padding-bottom:12px;border-bottom:1px solid var(--line)"></div>
+      <div class="target-box" id="mmGold" style="margin-top:14px"></div>
+      <p class="mini" style="margin:12px 0 4px">하나의 골드로 두 가지가 동시에 진행됩니다</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="card" id="mmX1" style="background:var(--surface2)"></div>
+        <div class="card" id="mmX2" style="background:var(--surface2)"></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn primary" onclick="closeMember()">닫기</button></div>
+  </div>
+</div>
+
+<script>
+  // ---- navigation ----
+  var titles={dash:'대시보드',members:'회원 관리',grade:'멤버십 · 등급 정책',gold:'골드 관리',coupon:'쿠폰 관리',event:'이벤트 관리',mission:'미션 관리',store:'매장 관리',storecat:'매장 카테고리 관리',content:'콘텐츠 · 알림',inquiry:'1:1 문의 관리',report:'통계 · 리포트',system:'시스템 · 운영'};
+  function go(p){
+    document.querySelectorAll('.nav-item').forEach(function(n){n.classList.toggle('active',n.dataset.page===p)});
+    document.querySelectorAll('.page').forEach(function(s){s.classList.remove('active')});
+    var el=document.getElementById('page-'+p); if(el)el.classList.add('active');
+    document.getElementById('crumb').textContent=titles[p]||'';
+    document.querySelector('.canvas').scrollTop=0;
+  }
+  document.querySelectorAll('.nav-item').forEach(function(n){n.addEventListener('click',function(){go(n.dataset.page)})});
+
+  // chip toggles
+  document.addEventListener('click',function(e){
+    if(e.target.classList.contains('chip') && !e.target.closest('[data-multi]')){
+      var sibs=e.target.parentElement.querySelectorAll('.chip');
+      sibs.forEach(function(c){c.classList.remove('active')}); e.target.classList.add('active');
+    }
+    if(e.target.closest('.seg button')){
+      var b=e.target.closest('.seg button');
+      b.parentElement.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
+      if(b.dataset.period) renderFeed(b.dataset.period);
+      if(b.dataset.chart){ chartMetric=b.dataset.chart; renderChart(); }
+      if(b.dataset.cperiod){ chartPeriod=b.dataset.cperiod; var rb=document.getElementById('chartRangeBox'); if(rb) rb.style.display=chartPeriod==='range'?'flex':'none'; renderChart(); }
+    }
+  });
+
+  // ---- 기간별 골드 적립 (전일까지 집계) ----
+  var fIcons={
+    store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    window:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+    users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
+    gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/></svg>'
+  };
+  var feedData={
+    day:{range:'전일까지 집계 · 어제 (5/31)', total:'+168,540G', items:[
+      {ic:'store',n:'매장 결제 적립',c:'4,820건',a:'+96,400G'},
+      {ic:'window',n:'창문 닦기 미션',c:'1,046건',a:'+52,300G'},
+      {ic:'gift',n:'웰컴·이벤트 보너스',c:'93건',a:'+18,600G'},
+      {ic:'users',n:'친구 초대',c:'124건',a:'+1,240G'}
+    ]},
+    week:{range:'전일까지 집계 · 지난 7일 (5/25~5/31)', total:'+1,130,370G', items:[
+      {ic:'store',n:'매장 결제 적립',c:'33,400건',a:'+642,000G'},
+      {ic:'window',n:'창문 닦기 미션',c:'7,178건',a:'+358,900G'},
+      {ic:'gift',n:'웰컴·이벤트 보너스',c:'605건',a:'+121,000G'},
+      {ic:'users',n:'친구 초대',c:'847건',a:'+8,470G'}
+    ]},
+    month:{range:'전일까지 집계 · 지난 30일 (5/2~5/31)', total:'+4,750,600G', items:[
+      {ic:'store',n:'매장 결제 적립',c:'138,000건',a:'+2,710,000G'},
+      {ic:'window',n:'창문 닦기 미션',c:'30,408건',a:'+1,520,400G'},
+      {ic:'gift',n:'웰컴·이벤트 보너스',c:'2,430건',a:'+486,000G'},
+      {ic:'users',n:'친구 초대',c:'3,420건',a:'+34,200G'}
+    ]}
+  };
+  function renderFeed(p){
+    var cust=document.getElementById('feedCustom');
+    if(p==='custom'){ cust.style.display='flex'; applyCustom(); return; }
+    cust.style.display='none';
+    var d=feedData[p]; if(!d) return;
+    document.getElementById('feedRange').textContent=d.range;
+    document.getElementById('feedTotal').textContent=d.total;
+    document.getElementById('feedBody').innerHTML=d.items.map(function(it){
+      return '<div class="feed-item"><div class="feed-ic">'+fIcons[it.ic]+'</div>'+
+        '<div class="feed-bd"><b>'+it.n+'</b><small>'+it.c+'</small></div>'+
+        '<span class="feed-amt">'+it.a+'</span></div>';
+    }).join('');
+  }
+  // 직접 기간 지정 (전일까지 집계, 일평균 × 일수 추정)
+  var perDay=[
+    {ic:'store', n:'매장 결제 적립',     g:96400, c:4820},
+    {ic:'window',n:'창문 닦기 미션',     g:52300, c:1046},
+    {ic:'gift',  n:'웰컴·이벤트 보너스', g:18600, c:93},
+    {ic:'users', n:'친구 초대',          g:1240,  c:124}
+  ];
+  function nf(n){return n.toLocaleString('en-US');}
+  function fmtD(s){var p=s.split('-');return (+p[1])+'/'+(+p[2]);}
+  function applyCustom(){
+    var fromEl=document.getElementById('feedFrom'), toEl=document.getElementById('feedTo');
+    var from=fromEl.value, to=toEl.value;
+    var body=document.getElementById('feedBody'), range=document.getElementById('feedRange'), total=document.getElementById('feedTotal');
+    if(!from||!to){range.textContent='시작일과 종료일을 선택하세요';return;}
+    if(from>to){range.textContent='시작일이 종료일보다 늦습니다';body.innerHTML='';total.textContent='+0G';return;}
+    if(to>'2026-05-31'){range.textContent='데이터는 전일(5/31)까지만 조회 가능합니다';body.innerHTML='';total.textContent='+0G';return;}
+    var days=Math.round((new Date(to)-new Date(from))/86400000)+1;
+    var sum=0;
+    body.innerHTML=perDay.map(function(it){
+      var g=it.g*days, c=it.c*days; sum+=g;
+      return '<div class="feed-item"><div class="feed-ic">'+fIcons[it.ic]+'</div>'+
+        '<div class="feed-bd"><b>'+it.n+'</b><small>'+nf(c)+'건</small></div>'+
+        '<span class="feed-amt">+'+nf(g)+'G</span></div>';
+    }).join('');
+    range.textContent='기간 지정 · '+fmtD(from)+' ~ '+fmtD(to)+' ('+days+'일)';
+    total.textContent='+'+nf(sum)+'G';
+  }
+  document.getElementById('feedApply').addEventListener('click',applyCustom);
+  renderFeed('day');
+
+  // ---- 골드/회원 추이 꺾은선 차트 (일/주/월/기간 · 기본 최근 30일) ----
+  var CBASE=new Date('2026-05-31'); // 전일까지 집계
+  function dayVal(d){
+    var t=Math.floor(d.getTime()/86400000);
+    var gold=148000+Math.round(Math.sin(t/3)*9000+Math.cos(t/9)*6000)+(t%5)*1400;
+    var member=Math.max(8,38+Math.round(Math.sin(t/2)*8+Math.cos(t/5)*5)+(t%3)*2);
+    return {gold:gold,member:member};
+  }
+  function mdLabel(d){return (d.getMonth()+1)+'/'+d.getDate();}
+  var chartMetric='gold', chartPeriod='day';
+  function buildSeries(){
+    var pts=[],i,k,v,d;
+    if(chartPeriod==='day'){
+      for(i=14;i>=0;i--){d=new Date(CBASE.getTime()-i*86400000);v=dayVal(d);pts.push({l:mdLabel(d),gold:v.gold,member:v.member});}
+    } else if(chartPeriod==='week'){
+      for(var w=11;w>=0;w--){var end=new Date(CBASE.getTime()-w*7*86400000),g=0,m=0;
+        for(k=0;k<7;k++){d=new Date(end.getTime()-k*86400000);v=dayVal(d);g+=v.gold;m+=v.member;}
+        pts.push({l:mdLabel(new Date(end.getTime()-6*86400000)),gold:g,member:m});}
+    } else if(chartPeriod==='month'){
+      var by=CBASE.getFullYear(),bm=CBASE.getMonth();
+      for(var mo=11;mo>=0;mo--){var y=by,mm=bm-mo;while(mm<0){mm+=12;y--;}var g2=0,m2=0,dd=new Date(y,mm,1);
+        while(dd.getMonth()===mm&&dd<=CBASE){v=dayVal(dd);g2+=v.gold;m2+=v.member;dd=new Date(dd.getTime()+86400000);}
+        pts.push({l:(mm+1)+'월',gold:g2,member:m2});}
+    } else { // range
+      var f=document.getElementById('chartFrom').value,t2=document.getElementById('chartTo').value;
+      var from=f?new Date(f):new Date(CBASE.getTime()-29*86400000),to=t2?new Date(t2):CBASE;
+      if(to>CBASE)to=CBASE; if(from>to)from=new Date(to.getTime()-29*86400000);
+      var cur=new Date(from.getTime()),guard=0;
+      while(cur<=to&&guard<400){v=dayVal(cur);pts.push({l:mdLabel(cur),gold:v.gold,member:v.member});cur=new Date(cur.getTime()+86400000);guard++;}
+    }
+    return pts;
+  }
+  function fmtGoldK(v){if(v>=1000000)return (v/1000000).toFixed(1)+'M';if(v>=1000)return Math.round(v/1000)+'K';return ''+v;}
+  function chartTitleText(){
+    var m=chartMetric==='gold'?'골드 적립':'신규 회원';
+    var p=chartPeriod==='day'?'최근 15일':chartPeriod==='week'?'최근 12주':chartPeriod==='month'?'최근 12개월':'기간';
+    return p+' '+m+' 추이';
+  }
+  function renderChart(){
+    var pts=buildSeries(), color=chartMetric==='gold'?'#A9803F':'#3E5C86';
+    var fmt=chartMetric==='gold'?fmtGoldK:function(v){return v+'명';};
+    document.getElementById('chartTitle').textContent=chartTitleText();
+    document.getElementById('chartSub').textContent=chartPeriod==='range'?'사용자 지정 기간 · 일 단위 · 최대 5/31':(chartPeriod==='day'?'전일(5/31)까지 집계 · 일 단위':chartPeriod==='week'?'주별 합계 · 전주까지':'월별 합계 · 당월 5/31까지');
+    var W=1000,H=320,padL=28,padR=28,padT=42,padB=36,plotW=W-padL-padR,plotH=H-padT-padB,bottom=padT+plotH,n=pts.length;
+    if(!n){document.getElementById('trendChart').innerHTML='<p class="mini">데이터가 없습니다.</p>';return;}
+    var vals=pts.map(function(p){return p[chartMetric];});
+    var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),span=(mx-mn)||1,dMin=mn-span*0.45,dMax=mx+span*0.3;
+    var X=function(i){return n===1?padL+plotW/2:padL+plotW*i/(n-1);};
+    var Y=function(v){return padT+plotH*(1-(v-dMin)/(dMax-dMin));};
+    var step=n<=12?1:Math.ceil(n/7);
+    var pc=pts.map(function(p,i){return X(i).toFixed(1)+','+Y(p[chartMetric]).toFixed(1);});
+    var grid='';[0,0.5,1].forEach(function(t){var y=padT+plotH*t;grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="#EFEAE1" stroke-width="0.8"/>';});
+    var dots='',labels='',xlab='';
+    pts.forEach(function(p,i){var x=X(i),y=Y(p[chartMetric]),show=(i%step===0)||(i===n-1);
+      dots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(n>16?2.2:3)+'" fill="#fff" stroke="'+color+'" stroke-width="'+(n>16?1.3:1.5)+'"/>';
+      if(n<=16||show)labels+='<text x="'+x.toFixed(1)+'" y="'+(y-8).toFixed(1)+'" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="8.5" font-weight="500" fill="#1C1C1E">'+fmt(p[chartMetric])+'</text>';
+      if(n<=16||show)xlab+='<text x="'+x.toFixed(1)+'" y="'+(H-9)+'" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="8.5" fill="#938B82">'+p.l+'</text>';});
+    var area='M'+X(0).toFixed(1)+','+bottom+' L'+pc.join(' L')+' L'+X(n-1).toFixed(1)+','+bottom+' Z';
+    document.getElementById('trendChart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block" xmlns="http://www.w3.org/2000/svg">'+
+      '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'" stop-opacity="0.18"/><stop offset="1" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+
+      grid+'<path d="'+area+'" fill="url(#cg)"/>'+
+      '<polyline points="'+pc.join(' ')+'" fill="none" stroke="'+color+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+      dots+labels+xlab+'</svg>';
+  }
+  renderChart();
+  ['chartFrom','chartTo'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('change',function(){if(chartPeriod==='range')renderChart();});});
+
+  // ==== 공통 페이지네이션 ====
+  function pagiHTML(total,cur){
+    if(total<1)total=1;
+    var bs=Math.floor((cur-1)/10)*10+1, be=Math.min(bs+9,total), h='';
+    h+='<button class="pg-btn" data-go="1"'+(cur===1?' disabled':'')+' aria-label="처음(최신)으로"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18l-6-6 6-6M18 18l-6-6 6-6"/></svg></button>';
+    for(var p=bs;p<=be;p++) h+='<button class="pg-num'+(p===cur?' on':'')+'" data-go="'+p+'">'+p+'</button>';
+    h+='<button class="pg-btn" data-go="'+total+'"'+(cur===total?' disabled':'')+' aria-label="끝으로"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M13 18l6-6-6-6M6 18l6-6-6-6"/></svg></button>';
+    return h;
+  }
+  function makePager(footId,getData,pageSize,renderFn){
+    var foot=document.getElementById(footId), page=1;
+    function draw(){
+      var data=getData(), t=Math.max(1,Math.ceil(data.length/pageSize));
+      if(page>t)page=t; if(page<1)page=1;
+      var s=(page-1)*pageSize;
+      renderFn(data.slice(s,s+pageSize),s);
+      foot.innerHTML=pagiHTML(t,page);
+    }
+    foot.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(!b||b.hasAttribute('disabled'))return;page=+b.dataset.go;draw();});
+    return {draw:function(reset){if(reset)page=1;draw();}};
+  }
+  var _sn=['김','이','박','최','정','강','조','윤','장','임','한','오','서','신','권','황','안','송','홍','문'];
+  var _gn=['민준','서연','도윤','지우','예준','하은','시우','지호','주원','지민','수아','지아','은우','유진','현우','서준','다은','지윤','준서','채원'];
+  var _name=function(i){return _sn[i%_sn.length]+_gn[(i*3)%_gn.length];};
+
+  // ---- 1:1 문의 관리 ----
+  var inquiries=[
+    {n:'박수현',t:'골드·적립',cc:'gold',q:'어제 63F 레스토랑에서 결제했는데 골드가 적립되지 않았어요.',d:'오늘 13:40',st:'대기중'},
+    {n:'이도현',t:'쿠폰',cc:'blue',q:'28F 와인 1+1 쿠폰이 매장에서 사용되지 않습니다.',d:'오늘 11:12',st:'대기중'},
+    {n:'최유진',t:'등급·멤버십',cc:'floor',q:'28F 도달 조건을 채운 것 같은데 등급이 그대로예요.',d:'오늘 09:30',st:'대기중'},
+    {n:'강하늘',t:'앱 오류',cc:'red',q:'창문 닦기 미션 스크래치 화면이 중간에 멈춥니다.',d:'어제',st:'대기중'},
+    {n:'윤서아',t:'매장·혜택',cc:'gray',q:'59F 파인다이닝 주말 영업시간과 라스트오더가 궁금합니다.',d:'어제',st:'대기중'},
+    {n:'정민서',t:'회원정보',cc:'gray',q:'등록된 전화번호를 변경하고 싶습니다.',d:'어제',st:'대기중'},
+    {n:'오태경',t:'친구 초대',cc:'green',q:'친구 초대를 완료했는데 +10G 보너스가 들어오지 않았어요.',d:'2일 전',st:'대기중'},
+    {n:'김서준',t:'쿠폰',cc:'blue',q:'기프트 쿠폰 재고가 소진되었는지 확인 부탁드립니다.',d:'2일 전',st:'답변완료'},
+    {n:'한지우',t:'골드·적립',cc:'gold',q:'적립한 골드도 매년 만료되나요?',d:'3일 전',st:'답변완료'},
+    {n:'서아린',t:'기타',cc:'gray',q:'주차 차량 등록은 어디서 하나요?',d:'3일 전',st:'보류'}
+  ];
+  var stTag={'대기중':'red','답변완료':'green','보류':'gray'};
+  (function(){
+    var types=[['골드·적립','gold'],['쿠폰','blue'],['등급·멤버십','floor'],['앱 오류','red'],['매장·혜택','gray'],['회원정보','gray'],['친구 초대','green'],['기타','gray']];
+    var qs=['적립이 정상 처리됐는지 확인 부탁드립니다.','쿠폰 사용 관련 문의드립니다.','등급 산정 기준이 궁금합니다.','앱에서 오류가 발생합니다.','매장 영업시간을 알고 싶어요.','정보 변경을 요청합니다.','보너스 골드가 들어오지 않았어요.','이용 관련 문의입니다.'];
+    var sts=['답변완료','답변완료','보류','답변완료'];
+    for(var i=inquiries.length;i<60;i++){var t=types[i%types.length];inquiries.push({n:_name(i),t:t[0],cc:t[1],q:qs[i%qs.length],d:((i%7)+3)+'일 전',st:sts[i%sts.length]});}
+  })();
+  var inqFilter='all';
+  function renderInquiryRows(list){
+    document.getElementById('inquiryRows').innerHTML=list.map(function(x){
+      var act=x.st==='답변완료'
+        ? '<button class="btn" style="padding:6px 12px;font-size:12px">보기</button>'
+        : '<button class="btn primary" style="padding:6px 12px;font-size:12px">답변하기</button>';
+      return '<tr><td><span class="av-sm">'+x.n.charAt(0)+'</span><span class="uname">'+x.n+'</span></td>'+
+        '<td><span class="tag '+x.cc+'">'+x.t+'</span></td>'+
+        '<td style="max-width:320px;color:var(--ink2)">'+x.q+'</td>'+
+        '<td class="mini">'+x.d+'</td>'+
+        '<td><span class="tag '+stTag[x.st]+'">'+x.st+'</span></td>'+
+        '<td style="text-align:right">'+act+'</td></tr>';
+    }).join('');
+  }
+  var pagerInq=makePager('pgInquiry',function(){return inqFilter==='all'?inquiries:inquiries.filter(function(x){return x.st===inqFilter;});},10,renderInquiryRows);
+  pagerInq.draw();
+  document.getElementById('inqChips').addEventListener('click',function(e){
+    var c=e.target.closest('.chip'); if(!c) return;
+    inqFilter=c.dataset.st; pagerInq.draw(true);
+  });
+
+  // ---- 이벤트 관리 (리스트형 · 상태 3종 · 노출 토글) ----
+  var events=[
+    {id:'ev2',name:'차량 등록 이벤트',desc:'주차 정보 등록 시 주차 할인',type:'공지형',store:null,start:'2025-01-01',end:null,parti:4880,st:'진행중',show:true},
+    {id:'ev3',name:'친구 초대',desc:'초대 성공 시 +10G',type:'공지형',store:null,start:'2025-03-01',end:null,parti:612,st:'진행중',show:true},
+    {id:'ev4',name:'부스팅 (적립 2배 타임)',desc:'적립 골드 2배',type:'선착순형',store:null,start:'2026-06-01',end:'2026-06-01',parti:2410,st:'진행중',show:true},
+    {id:'ev5',name:'골드 위너 피드',desc:'실시간 적립 현황 노출',type:'공지형',store:null,start:'2025-01-01',end:null,parti:0,st:'진행중',show:true},
+    {id:'ev6',name:'브랜드데이',desc:'다운로드 쿠폰 이벤트',type:'응모당첨형',store:'28F · 베이커리 파티스리드',start:'2026-06-15',end:'2026-06-21',parti:0,st:'예약',show:false},
+    {id:'ev7',name:'루프탑 크리스마스 이브',desc:'63 루프탑 한정 이벤트',type:'응모당첨형',store:'63F · 63 레스토랑',start:'2025-12-24',end:'2025-12-24',parti:1240,st:'종료',show:false}
+  ];
+  var stCls={'진행중':'green','예약':'gold','종료':'gray'};
+  var tyCls={'응모당첨형':'gold','선착순형':'blue','공지형':'gray'};
+  function evDate(s){if(!s)return '-';var p=s.split('-');return p[0].slice(2)+'.'+p[1]+'.'+p[2];}
+  function evEnd(end){
+    if(!end) return '<span class="mini">상시</span>';
+    var dd=Math.ceil((new Date(end)-new Date('2026-06-01'))/86400000);
+    return evDate(end)+' <span class="mini">'+(dd>=0?'(D-'+dd+')':'(종료)')+'</span>';
+  }
+  function renderEventRows(list){
+    document.getElementById('eventRows').innerHTML=list.map(function(x){
+      var dis=x.st==='종료'?'opacity:.55;':'';
+      var lbl=x.show?'노출 ON':'비노출';
+      return '<tr data-id="'+x.id+'">'+
+        '<td><div class="uname">'+x.name+'</div><div class="mini">'+x.desc+'</div></td>'+
+        '<td><span class="tag '+tyCls[x.type]+'">'+x.type+'</span></td>'+
+        '<td class="mini">'+(x.store?x.store:'<span style="color:var(--ink3)">해당없음</span>')+'</td>'+
+        '<td class="mini">'+evDate(x.start)+'</td>'+
+        '<td class="mini">'+evEnd(x.end)+'</td>'+
+        '<td class="num">'+x.parti.toLocaleString('en-US')+'명</td>'+
+        '<td><span class="tag '+stCls[x.st]+'">'+x.st+'</span></td>'+
+        '<td style="text-align:center;'+dis+'"><label class="tgl"><input type="checkbox" data-id="'+x.id+'"'+(x.show?' checked':'')+(x.st==='종료'?' disabled':'')+'><span class="track"></span><span class="knob"></span></label><span class="tgl-lbl'+(x.show?' on':'')+'">'+lbl+'</span></td>'+
+        '<td style="text-align:right"><button class="btn" style="padding:6px 12px;font-size:12px">관리</button></td></tr>';
+    }).join('');
+  }
+  function eventMatch(x){
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var name=v('eqName'), store=v('eqStore'), type=document.getElementById('eqType').value, status=document.getElementById('eqStatus').value, show=document.getElementById('eqShow').value;
+    var ef=v('eqEndFrom'), et=v('eqEndTo'), pmin=v('eqPartiMin'), pmax=v('eqPartiMax');
+    if(name && x.name.indexOf(name)<0) return false;
+    if(store){ if(!x.store || x.store.indexOf(store)<0) return false; }
+    if(type!=='all' && x.type!==type) return false;
+    if(status!=='all' && x.st!==status) return false;
+    if(show!=='all'){ if(show==='노출' && !x.show) return false; if(show==='비노출' && x.show) return false; }
+    if(ef || et){ if(!x.end) return false; if(ef && x.end<ef) return false; if(et && x.end>et) return false; }
+    if(pmin!=='' && x.parti<+pmin) return false;
+    if(pmax!=='' && x.parti>+pmax) return false;
+    return true;
+  }
+  var pagerEvt=makePager('pgEvents',function(){
+    var list=events.filter(eventMatch);
+    var el=document.getElementById('eventCount'); if(el) el.textContent='검색 결과 '+list.length+'개';
+    return list;
+  },10,renderEventRows);
+  pagerEvt.draw();
+  document.getElementById('eqSearch').addEventListener('click',function(){pagerEvt.draw(true);});
+  ['eqType','eqStatus','eqShow','eqEndFrom','eqEndTo'].forEach(function(id){document.getElementById(id).addEventListener('change',function(){pagerEvt.draw(true);});});
+  ['eqName','eqStore','eqPartiMin','eqPartiMax'].forEach(function(id){document.getElementById(id).addEventListener('keyup',function(e){if(e.key==='Enter')pagerEvt.draw(true);});});
+  document.getElementById('eqReset').addEventListener('click',function(){
+    ['eqName','eqStore','eqEndFrom','eqEndTo','eqPartiMin','eqPartiMax'].forEach(function(id){document.getElementById(id).value='';});
+    ['eqType','eqStatus','eqShow'].forEach(function(id){document.getElementById(id).value='all';});
+    pagerEvt.draw(true);
+  });
+  // 노출 토글: ON→OFF 시 확인 알럿
+  document.getElementById('eventRows').addEventListener('change',function(e){
+    var inp=e.target; if(inp.type!=='checkbox') return;
+    var ev=events.find(function(x){return x.id===inp.dataset.id;}); if(!ev) return;
+    if(ev.show && !inp.checked){
+      var ok=confirm('"'+ev.name+'" 이벤트를 앱에서 비노출 처리할까요?\n사용자에게 더 이상 노출되지 않습니다.');
+      if(!ok){ inp.checked=true; return; }   // 취소 시 ON 유지
+    }
+    ev.show=inp.checked;
+    var lbl=inp.closest('td').querySelector('.tgl-lbl');
+    lbl.textContent=ev.show?'노출 ON':'비노출';
+    lbl.classList.toggle('on',ev.show);
+  });
+
+  // ---- 미션 관리 (창문닦기) 노출 토글 ----
+  var mWin=document.getElementById('mTglWin');
+  if(mWin){
+    var mWinShow=true;
+    mWin.addEventListener('change',function(){
+      if(mWinShow && !mWin.checked){
+        if(!confirm('"창문 닦기 (스크래치)" 미션을 앱에서 비노출 처리할까요?\n사용자에게 더 이상 노출되지 않습니다.')){ mWin.checked=true; return; }
+      }
+      mWinShow=mWin.checked;
+      var l=document.getElementById('mLblWin');
+      l.textContent=mWinShow?'노출 ON':'비노출';
+      l.classList.toggle('on',mWinShow);
+    });
+  }
+
+  // ---- member rows (mock) ----
+  var members=[
+    {n:'박수현',id:'M-2024-0017-8453',p:'010-3825-1947',b:'920314',gd:'여',f:'27F',c:'M-Class',cc:'blue',mg:300,sg:948,gy:900,prog:0.4,cp:3,st:'활성',sc:'green',d:'2024.03.12'},
+    {n:'이도현',id:'M-2025-0431-1190',p:'010-7412-6633',b:'880722',gd:'남',f:'59F',c:'L-Class',cc:'gold',mg:920,sg:5500,gy:5200,prog:0.6,cp:5,st:'활성',sc:'green',d:'2025.01.08'},
+    {n:'최유진',id:'M-2026-0012-7740',p:'010-2298-5071',b:'950511',gd:'여',f:'28F',c:'M-Class',cc:'blue',mg:320,sg:200,gy:520,prog:0.2,cp:2,st:'활성',sc:'green',d:'2026.05.20'},
+    {n:'정민서',id:'M-2023-0098-2210',p:'010-9043-1182',b:'791105',gd:'여',f:'63F+',c:'H-Class',cc:'floor',mg:2100,sg:32000,gy:22000,prog:1,cp:8,st:'활성',sc:'green',d:'2023.07.01'},
+    {n:'강하늘',id:'M-2025-0220-5512',p:'010-5567-8890',b:'010203',gd:'남',f:'27F',c:'Ground',cc:'gray',mg:80,sg:0,gy:80,prog:0.1,cp:1,st:'휴면',sc:'gray',d:'2025.09.14'},
+    {n:'윤서아',id:'M-2024-0333-6601',p:'010-3310-4456',b:'930825',gd:'여',f:'63F',c:'L-Class',cc:'gold',mg:1560,sg:12000,gy:11000,prog:0.8,cp:6,st:'활성',sc:'green',d:'2024.11.22'},
+    {n:'오태경',id:'M-2026-0044-8890',p:'010-8801-2274',b:'970430',gd:'남',f:'27F',c:'Ground',cc:'gray',mg:0,sg:0,gy:0,prog:0,cp:0,st:'정지',sc:'red',d:'2026.05.30'}
+  ];
+  function maskPhone(p){var a=p.split('-');if(a.length===3)a[1]='*'.repeat(a[1].length);return a.join('-');}
+  function fmtBirth(b){return b.slice(0,2)+'.'+b.slice(2,4)+'.'+b.slice(4,6);}
+  function gtot(m){return (m.mg||0)+(m.sg||0);}           // 누적 = 미션골드 + 매장골드
+  function gfmt(n){return n.toLocaleString('en-US');}
+  function floorFromGold(n){n=n||0;
+    if(n>=30000)return '63F+';if(n>=12000)return '63F';if(n>=5000)return '59F';if(n>=350)return '28F';return '27F';}
+  // 연간 등급(X2): 올해 누적 골드 → 등급. (집계만, 차감 없음)
+  var CLASS_THR=[['Ground',0,'gray'],['M-Class',1500,'blue'],['L-Class',6000,'gold'],['H-Class',18000,'floor']];
+  function classFromYear(g){var r=CLASS_THR[0];for(var i=0;i<CLASS_THR.length;i++){if(g>=CLASS_THR[i][1])r=CLASS_THR[i];}return r;}
+  function nextClassThr(g){for(var i=0;i<CLASS_THR.length;i++){if(g<CLASS_THR[i][1])return CLASS_THR[i];}return null;}
+  function classRank(name){for(var i=0;i<CLASS_THR.length;i++){if(CLASS_THR[i][0]===name)return i;}return 0;}
+  // 층 여정(X1): 가입 기념일 기준 1년 · 다음 기념일까지 D-day
+  function journeyEnd(dstr){
+    var p=dstr.split('.'); var mo=+p[1], dy=+p[2];
+    var end=new Date(2026,mo-1,dy); if(end<new Date('2026-06-01')) end=new Date(2027,mo-1,dy);
+    var dd=Math.ceil((end-new Date('2026-06-01'))/86400000);
+    return {label:end.getFullYear()+'.'+('0'+mo).slice(-2)+'.'+('0'+dy).slice(-2), dday:dd};
+  }
+  (function(){
+    var tiers=[['27F','Ground','gray',80],['28F','M-Class','blue',900],['59F','L-Class','gold',6200],['63F','L-Class','gold',14500],['63F+','H-Class','floor',31000]];
+    var sts=[['활성','green'],['활성','green'],['활성','green'],['휴면','gray'],['정지','red']];
+    for(var i=members.length;i<84;i++){
+      var t=tiers[i%5], s=sts[i%5], z=function(n){return ('0'+n).slice(-2);};
+      var tot=t[3]+i*23, mg=Math.round(tot*0.2), sg=tot-mg;
+      members.push({n:_name(i),id:'M-2025-'+z(10+i%80)+'-'+(2000+i*37%8000),p:'010-'+(1000+i*13%9000)+'-'+(1000+i*29%9000),
+        b:z(70+i%32)+z(1+i%12)+z(1+i%28),gd:(i%2?'남':'여'),f:t[0],c:t[1],cc:t[2],mg:mg,sg:sg,gy:Math.round(tot*0.55),prog:((i*7)%10)/10,cp:i%9,st:s[0],sc:s[1],d:'2025.'+z(1+i%12)+'.'+z(1+i%28)});
+    }
+  })();
+  function renderMemberRows(list){
+    document.getElementById('memberRows').innerHTML=list.map(function(m){
+      var je=journeyEnd(m.d), pred=classFromYear(m.gy||0);
+      return '<tr><td><span class="av-sm">'+m.n.charAt(0)+'</span><span class="uname">'+m.n+'</span></td>'+
+        '<td class="uid">'+m.id+'</td>'+
+        '<td class="uid">'+maskPhone(m.p)+'</td>'+
+        '<td class="uid">'+fmtBirth(m.b)+'</td>'+
+        '<td><span class="tag gray">'+m.gd+'</span></td>'+
+        '<td><span class="tag floor">'+m.f+'</span></td>'+
+        '<td class="mini">D-'+je.dday+'<div style="margin-top:2px;color:var(--ink3)">~'+je.label+'</div></td>'+
+        '<td>'+m.c+'</td>'+
+        '<td><span class="tag '+(classRank(pred[0])>classRank(m.c)?'red':classRank(pred[0])<classRank(m.c)?'blue':'gray')+'">'+pred[0]+'</span></td>'+
+        '<td class="gold-amt">'+gfmt(gtot(m))+' G <span class="mini" style="font-weight:400">('+gfmt(m.mg)+'/'+gfmt(m.sg)+')</span></td>'+
+        '<td class="num">'+m.cp+'</td>'+
+        '<td><span class="tag '+m.sc+'">'+m.st+'</span></td>'+
+        '<td class="mini">'+m.d+'</td>'+
+        '<td style="text-align:right"><button class="btn" data-mid="'+m.id+'" style="padding:6px 12px;font-size:12px">관리</button></td></tr>';
+    }).join('');
+  }
+  function gnum(g){return parseInt(String(g).replace(/[^0-9]/g,''),10)||0;}
+
+  // 층 순서(-3F ~ 63F, 63F+ 최상위) 및 인덱스 맵
+  var FLOORS=[]; for(var _n=-3;_n<=63;_n++){FLOORS.push(_n<0?('B'+(-_n)):(_n===0?'GF':_n+'F'));} FLOORS.push('63F+');
+  var FIDX={}; FLOORS.forEach(function(f,i){FIDX[f]=i;});
+  (function(){
+    var blank='<option value="">―</option>';
+    var opts=blank+FLOORS.map(function(f){return '<option>'+f+'</option>';}).join('');
+    document.getElementById('fFloorMin').innerHTML=opts;
+    document.getElementById('fFloorMax').innerHTML=opts;
+  })();
+
+  // 복수 선택 칩 (전체 단독 · 전부 선택 시 전체로 수렴)
+  function multiChips(id, allCount, onChange){
+    var el=document.getElementById(id), sel=[];
+    function sync(){el.querySelectorAll('.chip').forEach(function(c){var s=c.dataset.st;c.classList.toggle('active', s==='all'?sel.length===0:sel.indexOf(s)>=0);});}
+    el.addEventListener('click',function(e){var c=e.target.closest('.chip'); if(!c)return; var s=c.dataset.st;
+      if(s==='all'){sel=[];} else {var i=sel.indexOf(s); if(i>=0)sel.splice(i,1); else sel.push(s); if(sel.length===allCount)sel=[];}
+      sync(); onChange&&onChange();});
+    sync();
+    return {get:function(){return sel;}, reset:function(){sel=[];sync();}};
+  }
+
+  var pagerMem=makePager('pgMembers',function(){var list=sortMembers(filterMembers());var el=document.getElementById('memberCount');if(el)el.textContent='검색 결과 '+list.length.toLocaleString('en-US')+'명';return list;},12,renderMemberRows);
+  var statusM=multiChips('memberChips',3,function(){pagerMem.draw(true);});
+  var classM =multiChips('classChips',4,function(){pagerMem.draw(true);});
+
+  function filterMembers(){
+    var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+    var name=v('fName'), mid=v('fId'), ph=v('fPhone'), gd=v('fGender');
+    var fmin=v('fFloorMin'), fmax=v('fFloorMax');
+    var gmin=v('fGoldMin'), gmax=v('fGoldMax'), dfrom=v('fDateFrom'), dto=v('fDateTo');
+    var sts=statusM.get(), cls=classM.get();
+    return members.filter(function(m){
+      if(name.length>=1 && m.n.indexOf(name)<0) return false;
+      if(mid.length>=4 && m.id.indexOf(mid)<0) return false;
+      if(ph.length>=4){ if(m.p.replace(/[^0-9]/g,'').slice(-4).indexOf(ph)<0) return false; }
+      if(gd && gd!=='all' && m.gd!==gd) return false;
+      var fi=FIDX[m.f];
+      if(fmin && (fi===undefined || fi<FIDX[fmin])) return false;
+      if(fmax && (fi===undefined || fi>FIDX[fmax])) return false;
+      if(cls.length && cls.indexOf(m.c)<0) return false;
+      var g=gtot(m);
+      if(gmin!=='' && g<+gmin) return false;
+      if(gmax!=='' && g>+gmax) return false;
+      if(sts.length && sts.indexOf(m.st)<0) return false;
+      var md=m.d.replace(/\./g,'-');
+      if(dfrom && md<dfrom) return false;
+      if(dto && md>dto) return false;
+      return true;
+    });
+  }
+  function sortMembers(arr){
+    var s=document.getElementById('fSort').value; arr=arr.slice();
+    if(s==='gold') arr.sort(function(a,b){return gtot(b)-gtot(a);});
+    else if(s==='name') arr.sort(function(a,b){return a.n.localeCompare(b.n,'ko');});
+    else arr.sort(function(a,b){return a.d<b.d?1:(a.d>b.d?-1:0);}); // 최신가입순(기본)
+    return arr;
+  }
+
+  // 층 빠른 구간 프리셋
+  var FPRESET={'all':['',''], '저층':['B3','27F'], '중층':['28F','50F'], '고층':['51F','']};
+  function setFloorPreset(key){
+    var r=FPRESET[key]||['',''];
+    document.getElementById('fFloorMin').value=r[0];
+    document.getElementById('fFloorMax').value=r[1];
+    document.querySelectorAll('#floorPresets .chip').forEach(function(c){c.classList.toggle('active',c.dataset.fp===key);});
+  }
+  document.getElementById('floorPresets').addEventListener('click',function(e){
+    var c=e.target.closest('.chip'); if(!c) return;
+    setFloorPreset(c.dataset.fp); pagerMem.draw(true);
+  });
+  // 범위 셀렉트 직접 변경 시 프리셋 해제
+  ['fFloorMin','fFloorMax'].forEach(function(id){
+    document.getElementById(id).addEventListener('change',function(){
+      document.querySelectorAll('#floorPresets .chip').forEach(function(c){c.classList.remove('active');});
+      pagerMem.draw(true);
+    });
+  });
+
+  pagerMem.draw();
+  document.getElementById('fSearch').addEventListener('click',function(){pagerMem.draw(true);});
+  document.getElementById('fSort').addEventListener('change',function(){pagerMem.draw(true);});
+  document.getElementById('fGender').addEventListener('change',function(){pagerMem.draw(true);});
+  document.getElementById('fReset').addEventListener('click',function(){
+    ['fName','fId','fPhone','fGoldMin','fGoldMax','fDateFrom','fDateTo'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('fGender').value='all';
+    setFloorPreset('all'); statusM.reset(); classM.reset();
+    pagerMem.draw(true);
+  });
+  ['fName','fId','fPhone','fGoldMin','fGoldMax'].forEach(function(id){
+    document.getElementById(id).addEventListener('keyup',function(e){if(e.key==='Enter')pagerMem.draw(true);});
+  });
+  // 현재 층·등급 전체 일괄 새로고침 (누적 골드 기준 재산정)
+  var mrBtn=document.getElementById('memberRefresh');
+  mrBtn.addEventListener('click',function(){
+    if(mrBtn.classList.contains('spinning')) return;
+    mrBtn.classList.add('spinning');
+    setTimeout(function(){
+      members.forEach(function(m){m.f=floorFromGold(gtot(m));});
+      pagerMem.draw();
+      mrBtn.classList.remove('spinning');
+      var d=new Date(), z=function(n){return ('0'+n).slice(-2);};
+      document.getElementById('memberSync').textContent='마지막 갱신 '+z(d.getHours())+':'+z(d.getMinutes())+':'+z(d.getSeconds());
+    },750);
+  });
+
+  // ---- 매장 관리 (페이지네이션) ----
+  var AMEN=['콜키지 가능','생일 혜택','비건 메뉴','단체 이용 가능','포장','배달','무선 인터넷','남/녀 화장실 구분','대기공간','예약','반려동물 동반'];
+  var stores=[
+    {id:'s1',n:'워킹 인 더 클라우드',f:'59F',cat:'Lounge',cc:'gold',h:'11:00~22:00',lo:'21:00',cp:2,st:'영업중',sc:'green',
+     desc:'레스토랑 델피노는 프리미엄 한정식과 한식 기반 퓨전 요리를 선보이는 파인 다이닝 공간입니다. 유명 셰프의 창의적인 메뉴와 정갈한 코스로 특별한 미식 경험을 제공합니다.',
+     amenities:['콜키지 가능','생일 혜택','비건 메뉴','단체 이용 가능','포장','배달','무선 인터넷','남/녀 화장실 구분','대기공간','예약','반려동물 동반'],
+     menu:[
+       {cat:'COURSE',name:'델피노 시그니처 코스',price:'189,000원',desc:'계절 식재료로 구성한 7코스 풀 디너. 와인 페어링 가능.',badge:'SIGNATURE'},
+       {cat:'COURSE',name:'한정식 코스',price:'128,000원',desc:'전통 한식의 정수를 담은 5코스 구성.',badge:''},
+       {cat:'COURSE',name:'런치 비즈니스 세트',price:'65,000원',desc:'점심 한정. 메인 + 사이드 2종 + 음료 포함.',badge:''},
+       {cat:'À LA CARTE',name:'한우 안심 스테이크',price:'78,000원',desc:'1++ 등급 한우 안심, 트러플 소스.',badge:''},
+       {cat:'À LA CARTE',name:'전복 솥밥',price:'42,000원',desc:'완도산 활전복과 자연송이를 더한 솥밥.',badge:''},
+       {cat:'À LA CARTE',name:'제철 채소 비건 플레이트',price:'35,000원',desc:'제철 채소만으로 구성한 비건 디시.',badge:'VEGAN'},
+       {cat:'BEVERAGE',name:'와인 글라스 (셀렉션)',price:'18,000원~',desc:'소믈리에 추천 4종 중 선택.',badge:''}
+     ],
+     notices:[
+       {type:'공지',date:'2026.05.10',title:'5월 가정의 달 한정 코스 운영',body:'5월 한 달간 가정의 달 기념 한정 코스를 한정 수량으로 운영합니다. 사전 예약 필수입니다.'},
+       {type:'휴무',date:'2026.05.20',title:'정기 휴무 안내 — 매월 셋째 주 월요일',body:'정기 휴무로 인해 5월 20일(월)은 영업하지 않습니다. 예약 시 참고 부탁드립니다.'},
+       {type:'안내',date:'2026.05.01',title:'콜키지 정책 안내',body:'와인 한 병당 5만원의 콜키지 비용이 발생합니다. 디캔팅·글라스 서비스가 포함되어 있습니다.'},
+       {type:'안내',date:'2026.04.28',title:'단체 예약 (10인 이상) 사전 문의 안내',body:'10인 이상 단체 예약은 별도 룸 운영을 위해 최소 3일 전 사전 문의 부탁드립니다.'},
+       {type:'안내',date:'2026.04.15',title:'드레스 코드 안내',body:'디너 타임(18시 이후) 슬리퍼·반바지 입장이 제한됩니다. 스마트 캐주얼을 권장합니다.'}
+     ]}
+  ];
+  (function(){
+    var seed=[
+      ['s2','파인다이닝 델피노','59F','F&B','gray','11:30~22:00','21:00',1,'영업중','green'],
+      ['s3','스카이 바','59F','Bar','gold','17:00~01:00','24:00',1,'영업중','green'],
+      ['s4','한우다이닝 우공','58F','F&B','gray','11:30~22:00','21:00',2,'영업중','green'],
+      ['s5','스시 오마카세 하루','58F','F&B','gray','12:00~22:00','20:30',0,'영업중','green'],
+      ['s6','카페 컬처스페이스','58F','Cafe','gray','10:00~21:00','20:30',1,'영업중','green'],
+      ['s7','63아트 기프트샵','57F','Art','blue','10:00~20:00','-',1,'영업중','green'],
+      ['s8','스트림&뮤트','57F','Fashion','gold','11:00~21:00','-',1,'영업중','green'],
+      ['s9','라멘야시마','GL','F&B','gray','주말 영업시간 변경','21:00',1,'휴무','red'],
+      ['s10','벤슨','GL','F&B','gray','10:00~21:00','20:30',1,'영업중','green'],
+      ['s11','브레드랩','GL','Bakery','gray','08:00~20:00','-',0,'오픈예정','blue']
+    ];
+    seed.forEach(function(a){
+      stores.push({id:a[0],n:a[1],f:a[2],cat:a[3],cc:a[4],h:a[5],lo:a[6],cp:a[7],st:a[8],sc:a[9],
+        desc:a[1]+' 매장 소개를 입력하세요.',
+        amenities:['포장','무선 인터넷','예약'],
+        menu:[{cat:'À LA CARTE',name:'대표 메뉴',price:'25,000원',desc:'시그니처 단품.',badge:''},{cat:'BEVERAGE',name:'음료',price:'8,000원',desc:'',badge:''}],
+        notices:[{type:'안내',date:'2026.05.01',title:'운영 안내',body:'영업시간을 참고해 주세요.'}]});
+    });
+  })();
+  function renderStoreRows(list){
+    document.getElementById('storeRows').innerHTML=list.map(function(s){
+      return '<tr><td class="uname">'+s.n+'</td><td><span class="tag floor">'+s.f+'</span></td>'+
+        '<td><span class="tag '+s.cc+'">'+s.cat+'</span></td><td class="mini">'+s.h+(s.lo&&s.lo!=='-'?' (L.O '+s.lo+')':'')+'</td>'+
+        '<td class="num">'+s.cp+'</td><td><span class="tag '+s.sc+'">'+s.st+'</span></td>'+
+        '<td style="text-align:right"><button class="btn" data-sid="'+s.id+'" style="padding:6px 12px;font-size:12px">관리</button></td></tr>';
+    }).join('');
+  }
+  function storeMatch(s){
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var name=v('sqName'), floor=document.getElementById('sqFloor').value, cat=document.getElementById('sqCat').value,
+        status=document.getElementById('sqStatus').value, amen=document.getElementById('sqAmen').value, cpmin=v('sqCpMin'), cpmax=v('sqCpMax');
+    if(name && s.n.indexOf(name)<0) return false;
+    if(floor!=='all' && s.f!==floor) return false;
+    if(cat!=='all' && s.cat!==cat) return false;
+    if(status!=='all' && s.st!==status) return false;
+    if(amen!=='all' && (s.amenities||[]).indexOf(amen)<0) return false;
+    if(cpmin!=='' && s.cp<+cpmin) return false;
+    if(cpmax!=='' && s.cp>+cpmax) return false;
+    return true;
+  }
+  var pagerStore=makePager('pgStore',function(){
+    var list=stores.filter(storeMatch);
+    var el=document.getElementById('storeCount'); if(el) el.textContent='검색 결과 '+list.length+'개 매장';
+    return list;
+  },12,renderStoreRows);
+  pagerStore.draw();
+  document.getElementById('sqAmen').innerHTML='<option value="all">전체</option>'+AMEN.map(function(a){return '<option>'+a+'</option>';}).join('');
+  document.getElementById('sqSearch').addEventListener('click',function(){pagerStore.draw(true);});
+  ['sqFloor','sqCat','sqStatus','sqAmen'].forEach(function(id){document.getElementById(id).addEventListener('change',function(){pagerStore.draw(true);});});
+  ['sqName','sqCpMin','sqCpMax'].forEach(function(id){document.getElementById(id).addEventListener('keyup',function(e){if(e.key==='Enter')pagerStore.draw(true);});});
+  document.getElementById('sqReset').addEventListener('click',function(){
+    ['sqName','sqCpMin','sqCpMax'].forEach(function(id){document.getElementById(id).value='';});
+    ['sqFloor','sqCat','sqStatus','sqAmen'].forEach(function(id){document.getElementById(id).value='all';});
+    pagerStore.draw(true);
+  });
+  document.getElementById('storeRows').addEventListener('click',function(e){
+    var b=e.target.closest('[data-sid]'); if(!b) return;
+    openStore(b.dataset.sid);
+  });
+
+  // ---- 쿠폰 관리 (목록형 · 만료 임박순) ----
+  var coupons2=[
+    {bd:'2+1',store:'28F · 베이커리 파티스리드',nm:'두바이 크로와상 2+1 쿠폰',tt:'발급',dday:2,issued:980,used:902},
+    {bd:'1+1',store:'28F · 파인다이닝 엘리노',nm:'오늘의 와인 1+1 쿠폰(잔)',tt:'발급',dday:7,issued:1204,used:812},
+    {bd:'FREE',store:'28F · 카페 컬처스페이스',nm:'아메리카노 1잔 무료',tt:'발급',dday:14,issued:3051,used:2440},
+    {bd:'10%',store:'63F · 63 레스토랑',nm:'식음료 10% 할인 쿠폰',tt:'발급',dday:35,issued:0,used:0},
+    {bd:'GIFT',store:'2F · 63아트 기프트샵',nm:'엽서+책갈피 기프트 세트',tt:'발급',dday:66,issued:540,used:121},
+    {bd:'SIZE↑',store:'GF · 벤슨',nm:'무료 사이즈업 제공',tt:'발급',dday:null,issued:1332,used:1332}
+  ];
+  (function(){
+    var bds=['10%','FREE','1+1','GIFT','2+1','SIZE↑','15%','20%'];
+    var nm=['시즌 음료 할인','디저트 증정','런치 세트 할인','베이커리 1+1','전 메뉴 5% 할인','웰컴 기프트','주말 한정 할인','신메뉴 체험'];
+    for(var i=coupons2.length;i<48;i++){
+      var ended=(i%4===2);
+      coupons2.push({bd:bds[i%bds.length],store:'63빌딩 입점 매장',nm:nm[i%nm.length],
+        tt:ended?'만료':'발급', dday:ended?null:((i*13)%120+1), issued:(200+i*37), used:(100+i*19)});
+    }
+  })();
+  function renderCouponRows(list){
+    document.getElementById('couponRows').innerHTML=list.map(function(c){
+      var exp=c.dday==null?'<span class="mini">상시</span>':'<span class="tag '+(c.dday<=7?'gold':'gray')+'">D-'+c.dday+'</span>';
+      return '<tr>'+
+        '<td><span class="tag" style="background:#2a2520;color:#F0DBA8;font-weight:700">'+c.bd+'</span></td>'+
+        '<td class="mini">'+c.store+'</td>'+
+        '<td class="uname">'+c.nm+'</td>'+
+        '<td>'+exp+'</td>'+
+        '<td class="mini">'+c.issued.toLocaleString('en-US')+' / '+c.used.toLocaleString('en-US')+' <span style="color:var(--gold);font-weight:600">('+(c.issued>0?(c.used/c.issued*100).toFixed(1):'0')+'%)</span></td>'+
+        '<td><span class="tag '+(c.tt==='만료'?'gray':'green')+'">'+c.tt+'</span></td></tr>';
+    }).join('');
+  }
+  var CP_TODAY=new Date('2026-06-01');
+  function cpExpiry(c){ if(c.dday==null) return null; var d=new Date(CP_TODAY.getTime()+c.dday*86400000); return d.toISOString().slice(0,10); }
+  function couponMatch(c){
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var name=v('cqName'), store=v('cqStore'), badge=document.getElementById('cqBadge').value, status=document.getElementById('cqStatus').value;
+    var ef=v('cqExpFrom'), et=v('cqExpTo'), issmin=v('cqIssMin'), issmax=v('cqIssMax'), usemin=v('cqUseMin'), usemax=v('cqUseMax');
+    if(status!=='all' && c.tt!==status) return false;
+    if(name && c.nm.indexOf(name)<0) return false;
+    if(store && c.store.indexOf(store)<0) return false;
+    if(badge!=='all' && c.bd!==badge) return false;
+    if(ef || et){ var ex=cpExpiry(c); if(!ex) return false; if(ef && ex<ef) return false; if(et && ex>et) return false; }
+    if(issmin!=='' && c.issued<+issmin) return false;
+    if(issmax!=='' && c.issued>+issmax) return false;
+    if(usemin!=='' && c.used<+usemin) return false;
+    if(usemax!=='' && c.used>+usemax) return false;
+    return true;
+  }
+  function cpRate(c){return c.issued>0?c.used/c.issued:0;}
+  var pagerCoupon=makePager('pgCoupon',function(){
+    var sort=document.getElementById('cqSort').value;
+    var list=coupons2.filter(couponMatch).slice().sort(function(a,b){
+      if(sort==='useHigh') return cpRate(b)-cpRate(a);
+      if(sort==='useLow') return cpRate(a)-cpRate(b);
+      var da=a.dday==null?Infinity:a.dday, db=b.dday==null?Infinity:b.dday; return da-db; // 만료일순(기본)
+    });
+    var el=document.getElementById('couponCount'); if(el) el.textContent='검색 결과 '+list.length+'종';
+    return list;
+  },10,renderCouponRows);
+  pagerCoupon.draw();
+  document.getElementById('cqSort').addEventListener('change',function(){pagerCoupon.draw(true);});
+  document.getElementById('cqSearch').addEventListener('click',function(){pagerCoupon.draw(true);});
+  document.getElementById('cqReset').addEventListener('click',function(){
+    ['cqName','cqStore','cqExpFrom','cqExpTo','cqIssMin','cqIssMax','cqUseMin','cqUseMax'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('cqBadge').value='all'; document.getElementById('cqStatus').value='all';
+    pagerCoupon.draw(true);
+  });
+  ['cqName','cqStore','cqIssMin','cqIssMax','cqUseMin','cqUseMax'].forEach(function(id){
+    document.getElementById(id).addEventListener('keyup',function(e){if(e.key==='Enter')pagerCoupon.draw(true);});
+  });
+  ['cqExpFrom','cqExpTo'].forEach(function(id){document.getElementById(id).addEventListener('change',function(){pagerCoupon.draw(true);});});
+
+  // ---- 멤버십 등급 정책: 전 층 임계값 + 수정 모드 ----
+  var gradeTiers=FLOORS.map(function(f,i){
+    return {f:f, thr:(i===0?0:Math.round((i*i*4+i*30)/10)*10), cnt:Math.max(0,Math.round(520*Math.pow(0.94,i))),
+      note:(f==='63F+'?'<span class="tag gold">VIP</span>':(i===0?'<span class="mini">시작 등급</span>':''))};
+  });
+  var gradeEditing=false;
+  function renderGrade(){
+    document.getElementById('gradeRows').innerHTML=gradeTiers.map(function(t,i){
+      var cell=gradeEditing
+        ? '<input class="gth finput" data-i="'+i+'" type="number" min="0" value="'+t.thr+'" style="width:140px;padding:6px 9px">'
+        : '<span class="num">'+t.thr.toLocaleString('en-US')+' G</span>';
+      return '<tr><td><span class="tag floor">'+t.f+'</span></td><td>'+cell+'</td>'+
+        '<td class="num">'+t.cnt.toLocaleString('en-US')+'</td><td>'+t.note+'</td></tr>';
+    }).join('');
+  }
+  renderGrade();
+  (function(){
+    var gEdit=document.getElementById('gradeEdit'),gCancel=document.getElementById('gradeCancel'),
+        gSave=document.getElementById('gradeSave'),gHint=document.getElementById('gradeHint');
+    function setMode(on){
+      gradeEditing=on;
+      gEdit.style.display=on?'none':''; gCancel.style.display=on?'':'none'; gSave.style.display=on?'':'none';
+      gHint.textContent=on?'편집 모드 · 각 층의 필요 누적 골드를 수정한 뒤 저장하세요':'전 68개 층 · 누적 골드 도달 시 해당 층 등급';
+      renderGrade();
+    }
+    gEdit.addEventListener('click',function(){setMode(true);});
+    gCancel.addEventListener('click',function(){setMode(false);}); // 변경 폐기
+    gSave.addEventListener('click',function(){
+      document.querySelectorAll('#gradeRows .gth').forEach(function(inp){var i=+inp.dataset.i,v=parseInt(inp.value,10);if(!isNaN(v)&&v>=0)gradeTiers[i].thr=v;});
+      setMode(false);
+    });
+  })();
+
+  // ---- Class 정의: 등급별 혜택 + 수정 모드 ----
+  var classDefs=[
+    {name:'Ground',cc:'gray',benefit:'기본 적립',cnt:'5,901'},
+    {name:'M-Class',cc:'blue',benefit:'월렛 · 결제 적립 1.2x',cnt:'4,330'},
+    {name:'L-Class',cc:'gold',benefit:'전용 쿠폰 · 1.5x',cnt:'2,168'},
+    {name:'H-Class',cc:'floor',benefit:'발렛 · 라운지 · 2x',cnt:'441'}
+  ];
+  var classEditing=false;
+  function renderClass(){
+    document.getElementById('classRows').innerHTML=classDefs.map(function(c,i){
+      var cell=classEditing
+        ? '<input class="cben finput" data-i="'+i+'" value="'+c.benefit.replace(/"/g,'&quot;')+'" style="width:100%;padding:6px 9px">'
+        : '<span class="mini">'+c.benefit+'</span>';
+      return '<tr><td><span class="tag '+c.cc+'">'+c.name+'</span></td><td>'+cell+'</td><td class="num">'+c.cnt+'</td></tr>';
+    }).join('');
+  }
+  renderClass();
+  (function(){
+    var cEdit=document.getElementById('classEdit'),cCancel=document.getElementById('classCancel'),
+        cSave=document.getElementById('classSave'),cHint=document.getElementById('classHint');
+    function setMode(on){
+      classEditing=on;
+      cEdit.style.display=on?'none':''; cCancel.style.display=on?'':'none'; cSave.style.display=on?'':'none';
+      cHint.textContent=on?'편집 모드 · 등급별 혜택을 수정한 뒤 저장하세요':'등급별 혜택';
+      renderClass();
+    }
+    cEdit.addEventListener('click',function(){setMode(true);});
+    cCancel.addEventListener('click',function(){setMode(false);});
+    cSave.addEventListener('click',function(){
+      document.querySelectorAll('#classRows .cben').forEach(function(inp){var i=+inp.dataset.i;classDefs[i].benefit=inp.value.trim();});
+      setMode(false);
+    });
+  })();
+
+  // ---- 골드 수동 지급 (2중 보안 → 대상 지정 → 지급 → 이력) ----
+  var GRANT_PW='admin';
+  var grantHistory=[
+    {dt:'2026.05.28 16:40', admin:'김운영', cond:'59F~63F+ · L-Class', cnt:38, per:1000, reason:'VIP 라운지 오픈 기념'},
+    {dt:'2026.05.15 10:12', admin:'박관리', cond:'전체 · 활성', cnt:9612, per:100, reason:'앱 점검 보상'}
+  ];
+  function renderGrantHistory(){
+    document.getElementById('grantHistoryRows').innerHTML=grantHistory.map(function(h){
+      return '<tr><td class="mini">'+h.dt+'</td><td>'+h.admin+'</td><td class="mini">'+h.cond+'</td>'+
+        '<td class="num">'+h.cnt.toLocaleString('en-US')+'명</td>'+
+        '<td class="gold-amt">+'+h.per.toLocaleString('en-US')+'G</td>'+
+        '<td class="gold-amt">'+(h.cnt*h.per).toLocaleString('en-US')+'G</td>'+
+        '<td class="mini">'+h.reason+'</td></tr>';
+    }).join('');
+  }
+  renderGrantHistory();
+
+  // 모달 층 셀렉트 채우기
+  (function(){var blank='<option value="">―</option>',opts=blank+FLOORS.map(function(f){return '<option>'+f+'</option>';}).join('');
+    document.getElementById('gFloorMin').innerHTML=opts; document.getElementById('gFloorMax').innerHTML=opts;})();
+  var gClassM=multiChips('gClassChips',4), gStatusM=multiChips('gStatusChips',3);
+
+  function grantFilter(){
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var name=v('gName'),mid=v('gId'),ph=v('gPhone'),gd=v('gGender'),fmin=v('gFloorMin'),fmax=v('gFloorMax'),gmin=v('gGoldMin'),gmax=v('gGoldMax'),dfrom=v('gDateFrom'),dto=v('gDateTo');
+    var cls=gClassM.get(),sts=gStatusM.get();
+    return members.filter(function(m){
+      if(name.length>=1 && m.n.indexOf(name)<0) return false;
+      if(mid.length>=4 && m.id.indexOf(mid)<0) return false;
+      if(ph.length>=4 && m.p.replace(/[^0-9]/g,'').slice(-4).indexOf(ph)<0) return false;
+      if(gd!=='all' && m.gd!==gd) return false;
+      var fi=FIDX[m.f];
+      if(fmin && (fi===undefined||fi<FIDX[fmin])) return false;
+      if(fmax && (fi===undefined||fi>FIDX[fmax])) return false;
+      if(cls.length && cls.indexOf(m.c)<0) return false;
+      var g=gtot(m);
+      if(gmin!=='' && g<+gmin) return false;
+      if(gmax!=='' && g>+gmax) return false;
+      if(sts.length && sts.indexOf(m.st)<0) return false;
+      var md=m.d.replace(/\./g,'-');
+      if(dfrom && md<dfrom) return false;
+      if(dto && md>dto) return false;
+      return true;
+    });
+  }
+  function grantCondText(){
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var parts=[];
+    if(v('gName')) parts.push('이름:'+v('gName'));
+    if(v('gId')) parts.push('회원번호:'+v('gId'));
+    if(v('gPhone')) parts.push('전화:'+v('gPhone'));
+    if(v('gGender')!=='all') parts.push(v('gGender'));
+    if(v('gFloorMin')||v('gFloorMax')) parts.push((v('gFloorMin')||'~')+'~'+(v('gFloorMax')||''));
+    if(gClassM.get().length) parts.push(gClassM.get().join('/'));
+    if(v('gGoldMin')||v('gGoldMax')) parts.push((v('gGoldMin')||'0')+'~'+(v('gGoldMax')||'∞')+'G');
+    if(gStatusM.get().length) parts.push(gStatusM.get().join('/'));
+    if(v('gDateFrom')||v('gDateTo')) parts.push('가입 '+(v('gDateFrom')||'')+'~'+(v('gDateTo')||''));
+    return parts.length?parts.join(' · '):'전체 회원';
+  }
+  var lastCount=null, pendingAmt=0, pendingReason='', pendingCond='';
+  function showStep(n){
+    document.getElementById('grantStep1').style.display=n===1?'':'none';
+    document.getElementById('grantStep2').style.display=n===2?'':'none';
+  }
+  window.closeGrant=function(){document.getElementById('grantModal').classList.remove('open');};
+  document.getElementById('openGrant').addEventListener('click',function(){
+    showStep(2);
+    document.getElementById('gTargetCount').textContent='—'; lastCount=null;
+    document.getElementById('grantErr').textContent='';
+    document.getElementById('grantModal').classList.add('open');
+    sizeOpenModal();
+  });
+  document.getElementById('gQuery').addEventListener('click',function(){
+    lastCount=grantFilter().length;
+    document.getElementById('gTargetCount').textContent=lastCount.toLocaleString('en-US')+'명';
+    document.getElementById('grantErr').textContent='';
+  });
+  // [지급 실행] → 검증 후 최종 확인(비밀번호) 단계로
+  document.getElementById('grantRun').addEventListener('click',function(){
+    var err=document.getElementById('grantErr');
+    if(lastCount===null){ err.textContent='먼저 [대상 조회]로 인원을 확인하세요.'; return; }
+    if(lastCount===0){ err.textContent='조건에 맞는 대상이 없습니다.'; return; }
+    var amt=parseInt(document.getElementById('gAmount').value,10);
+    if(isNaN(amt)||amt<1){ err.textContent='1인당 지급 골드를 입력하세요.'; return; }
+    var reason=document.getElementById('gReason').value.trim();
+    if(!reason){ err.textContent='지급 사유를 입력하세요.'; return; }
+    pendingAmt=amt; pendingReason=reason; pendingCond=grantCondText();
+    document.getElementById('cfTarget').textContent=lastCount.toLocaleString('en-US')+'명';
+    document.getElementById('cfPer').textContent='+'+amt.toLocaleString('en-US')+'G';
+    document.getElementById('cfTotal').textContent=(lastCount*amt).toLocaleString('en-US')+'G';
+    document.getElementById('cfReason').textContent=reason;
+    document.getElementById('grantPw').value=''; document.getElementById('grantPwErr').textContent='';
+    showStep(1);
+    sizeOpenModal();
+    setTimeout(function(){document.getElementById('grantPw').focus();},50);
+  });
+  document.getElementById('grantBack').addEventListener('click',function(){showStep(2);sizeOpenModal();});
+  // 비밀번호 확인 → 최종 실행
+  function runGrant(){
+    if(document.getElementById('grantPw').value!==GRANT_PW){ document.getElementById('grantPwErr').textContent='비밀번호가 일치하지 않습니다.'; return; }
+    var d=new Date(),z=function(n){return ('0'+n).slice(-2);};
+    grantHistory.unshift({dt:d.getFullYear()+'.'+z(d.getMonth()+1)+'.'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes()),
+      admin:'김운영', cond:pendingCond, cnt:lastCount, per:pendingAmt, reason:pendingReason});
+    renderGrantHistory();
+    closeGrant();
+    alert('지급 완료: '+lastCount.toLocaleString('en-US')+'명 · 총 '+(lastCount*pendingAmt).toLocaleString('en-US')+'G');
+  }
+  document.getElementById('grantPwOk').addEventListener('click',runGrant);
+  document.getElementById('grantPw').addEventListener('keyup',function(e){if(e.key==='Enter')runGrant();});
+
+  // ---- 쿠폰 발급 (매장 관리 등록 매장 매핑) ----
+  function fillCouponStores(){
+    var sel=document.getElementById('cpStore');
+    sel.innerHTML='<option value="">매장을 선택하세요</option>'+stores.map(function(s){var label=s.f+' · '+s.n;return '<option value="'+label+'">'+label+'</option>';}).join('');
+  }
+  window.closeCoupon=function(){document.getElementById('couponModal').classList.remove('open');};
+  document.getElementById('openCoupon').addEventListener('click',function(){
+    fillCouponStores();
+    ['cpName','cpFrom','cpTo','cpLimit','cpCond'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('cpStore').value=''; document.getElementById('cpBadge').value='1+1';
+    document.getElementById('cpErr').textContent='';
+    document.getElementById('couponModal').classList.add('open');
+    sizeOpenModal();
+  });
+  document.getElementById('cpCreate').addEventListener('click',function(){
+    var err=document.getElementById('cpErr');
+    var store=document.getElementById('cpStore').value;
+    var name=document.getElementById('cpName').value.trim();
+    if(!store){ err.textContent='매장을 선택하세요. (모든 쿠폰은 매장 지정 필수)'; return; }
+    if(!name){ err.textContent='쿠폰명을 입력하세요.'; return; }
+    var badge=document.getElementById('cpBadge').value;
+    var cond=document.getElementById('cpCond').value.trim()||'사용 조건 추후 지정';
+    var to=document.getElementById('cpTo').value, dday=null;
+    if(to){ dday=Math.ceil((new Date(to)-new Date('2026-06-01'))/86400000); }
+    var limit=document.getElementById('cpLimit').value;
+    coupons2.unshift({bd:badge, store:store, nm:name, tt:'발급', dday:dday, issued:0, used:0, cond:cond, limit:(limit?+limit:null)});
+    pagerCoupon.draw(true);
+    closeCoupon();
+    alert('쿠폰이 발급되었습니다.\n'+store+' · '+name);
+  });
+
+  // ---- 매장 상세 관리 (소개/메뉴/공지·안내) ----
+  var smCur=null, smNew=false;
+  window.closeStore=function(){document.getElementById('storeModal').classList.remove('open');};
+  function smMenuRow(m){
+    m=m||{cat:'À LA CARTE',name:'',price:'',desc:'',badge:''};
+    var cats=['COURSE','À LA CARTE','BEVERAGE'];
+    return '<div class="smrow" style="display:grid;grid-template-columns:104px 1fr 92px 30px;gap:7px;align-items:start;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--line2)">'+
+      '<select class="fsel sm-cat" style="padding:6px 8px">'+cats.map(function(c){return '<option'+(c===m.cat?' selected':'')+'>'+c+'</option>';}).join('')+'</select>'+
+      '<div style="display:flex;flex-direction:column;gap:5px">'+
+        '<input class="finput sm-mn" placeholder="메뉴명" value="'+(m.name||'').replace(/"/g,'&quot;')+'">'+
+        '<input class="finput sm-md" placeholder="설명" value="'+(m.desc||'').replace(/"/g,'&quot;')+'">'+
+        '<input class="finput sm-mb" placeholder="뱃지 (예: SIGNATURE)" value="'+(m.badge||'').replace(/"/g,'&quot;')+'">'+
+      '</div>'+
+      '<input class="finput sm-mp" placeholder="가격" value="'+(m.price||'').replace(/"/g,'&quot;')+'">'+
+      '<button class="btn sm-del" style="padding:4px 8px">✕</button></div>';
+  }
+  function smNoticeRow(n){
+    n=n||{type:'안내',date:'',title:'',body:''};
+    var tp=['공지','휴무','안내'];
+    return '<div class="smrow" style="display:grid;grid-template-columns:88px 120px 1fr 30px;gap:7px;align-items:start;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--line2)">'+
+      '<select class="fsel sm-nt" style="padding:6px 8px">'+tp.map(function(t){return '<option'+(t===n.type?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+      '<input class="finput sm-nd" placeholder="2026.05.01" value="'+(n.date||'').replace(/"/g,'&quot;')+'">'+
+      '<div style="display:flex;flex-direction:column;gap:5px">'+
+        '<input class="finput sm-nti" placeholder="제목" value="'+(n.title||'').replace(/"/g,'&quot;')+'">'+
+        '<input class="finput sm-nb" placeholder="내용" value="'+(n.body||'').replace(/"/g,'&quot;')+'">'+
+      '</div>'+
+      '<button class="btn sm-del" style="padding:4px 8px">✕</button></div>';
+  }
+  function openStore(id){
+    var s=stores.filter(function(x){return x.id===id;})[0]; if(!s) return;
+    smCur=s; smNew=false;
+    document.getElementById('smName').textContent=s.f+' · '+s.n;
+    document.getElementById('smSub').textContent='매장 상세 정보 등록 / 수정';
+    document.getElementById('smF_name').value=s.n;
+    document.getElementById('smF_floor').value=s.f;
+    document.getElementById('smF_cat').innerHTML=categories.map(function(c){return '<option'+(c.name===s.cat?' selected':'')+'>'+c.name+'</option>';}).join('')+(categories.some(function(c){return c.name===s.cat;})?'':'<option selected>'+s.cat+'</option>');
+    document.getElementById('smF_hours').value=s.h;
+    document.getElementById('smF_lo').value=(s.lo&&s.lo!=='-')?s.lo:'';
+    document.getElementById('smF_status').value=s.st;
+    document.getElementById('smF_desc').value=s.desc||'';
+    document.getElementById('smAmen').innerHTML=AMEN.map(function(a){return '<span class="chip'+(s.amenities.indexOf(a)>=0?' active':'')+'" data-am="'+a+'">'+a+'</span>';}).join('');
+    document.getElementById('smMenuList').innerHTML=(s.menu||[]).map(smMenuRow).join('');
+    document.getElementById('smNoticeList').innerHTML=(s.notices||[]).map(smNoticeRow).join('');
+    document.querySelectorAll('#smTabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab==='intro');});
+    smShowTab('intro');
+    document.getElementById('storeModal').classList.add('open');
+    sizeOpenModal();
+  }
+  function openStoreNew(){
+    smCur=null; smNew=true;
+    document.getElementById('smName').textContent='신규 매장 등록';
+    document.getElementById('smSub').textContent='매장 정보를 입력해 신규 등록합니다';
+    document.getElementById('smF_name').value='';
+    document.getElementById('smF_floor').value='GL';
+    document.getElementById('smF_cat').innerHTML=categories.map(function(c){return '<option>'+c.name+'</option>';}).join('');
+    document.getElementById('smF_hours').value='';
+    document.getElementById('smF_lo').value='';
+    document.getElementById('smF_status').value='오픈예정';
+    document.getElementById('smF_desc').value='';
+    document.getElementById('smAmen').innerHTML=AMEN.map(function(a){return '<span class="chip" data-am="'+a+'">'+a+'</span>';}).join('');
+    document.getElementById('smMenuList').innerHTML='';
+    document.getElementById('smNoticeList').innerHTML='';
+    document.querySelectorAll('#smTabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab==='intro');});
+    smShowTab('intro');
+    document.getElementById('storeModal').classList.add('open');
+    sizeOpenModal();
+  }
+  function smShowTab(t){
+    document.getElementById('smTabIntro').style.display=t==='intro'?'':'none';
+    document.getElementById('smTabMenu').style.display=t==='menu'?'':'none';
+    document.getElementById('smTabNotice').style.display=t==='notice'?'':'none';
+    sizeOpenModal();
+  }
+  document.getElementById('smTabs').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;smShowTab(b.dataset.tab);});
+  document.getElementById('smAmen').addEventListener('click',function(e){var c=e.target.closest('.chip');if(c)c.classList.toggle('active');});
+  document.getElementById('smMenuAdd').addEventListener('click',function(){document.getElementById('smMenuList').insertAdjacentHTML('beforeend',smMenuRow());sizeOpenModal();});
+  document.getElementById('smNoticeAdd').addEventListener('click',function(){document.getElementById('smNoticeList').insertAdjacentHTML('beforeend',smNoticeRow());sizeOpenModal();});
+  document.addEventListener('click',function(e){var d=e.target.closest('#storeModal .sm-del');if(d){d.closest('.smrow').remove();sizeOpenModal();}});
+  document.getElementById('smSave').addEventListener('click',function(){
+    var name=document.getElementById('smF_name').value.trim();
+    if(smNew && !name){ alert('매장명을 입력하세요.'); return; }
+    var floor=document.getElementById('smF_floor').value;
+    var cat=document.getElementById('smF_cat').value.trim();
+    var hours=document.getElementById('smF_hours').value.trim();
+    var lo=document.getElementById('smF_lo').value.trim()||'-';
+    var st=document.getElementById('smF_status').value;
+    var sc=({'영업중':'green','휴무':'red','오픈예정':'blue','영업 종료':'gray'})[st]||'gray';
+    var desc=document.getElementById('smF_desc').value.trim();
+    var amenities=Array.prototype.map.call(document.querySelectorAll('#smAmen .chip.active'),function(c){return c.dataset.am;});
+    var menu=Array.prototype.map.call(document.querySelectorAll('#smMenuList .smrow'),function(r){
+      return {cat:r.querySelector('.sm-cat').value,name:r.querySelector('.sm-mn').value.trim(),desc:r.querySelector('.sm-md').value.trim(),badge:r.querySelector('.sm-mb').value.trim(),price:r.querySelector('.sm-mp').value.trim()};
+    }).filter(function(m){return m.name;});
+    var notices=Array.prototype.map.call(document.querySelectorAll('#smNoticeList .smrow'),function(r){
+      return {type:r.querySelector('.sm-nt').value,date:r.querySelector('.sm-nd').value.trim(),title:r.querySelector('.sm-nti').value.trim(),body:r.querySelector('.sm-nb').value.trim()};
+    }).filter(function(n){return n.title;});
+    if(smNew){
+      var ns={id:'s'+Date.now(),n:name,f:floor,cat:cat,cc:catColor(cat),h:hours,lo:lo,st:st,sc:sc,cp:0,desc:desc,amenities:amenities,menu:menu,notices:notices};
+      stores.push(ns); pagerStore.draw(true); renderCatRows(); fillStoreCatFilter();
+      closeStore(); alert('신규 매장이 등록되었습니다: '+ns.f+' · '+ns.n); return;
+    }
+    if(!smCur) return;
+    smCur.n=name||smCur.n; smCur.f=floor; smCur.cat=cat; smCur.cc=catColor(cat);
+    smCur.h=hours; smCur.lo=lo; smCur.st=st; smCur.sc=sc; smCur.desc=desc;
+    smCur.amenities=amenities; smCur.menu=menu; smCur.notices=notices;
+    pagerStore.draw(); renderCatRows(); fillStoreCatFilter();
+    closeStore(); alert('매장 정보가 저장되었습니다: '+smCur.f+' · '+smCur.n);
+  });
+
+  // ---- 모달 크기: 컨테이너 너비는 CSS(width:80vw)로 고정 · 내부 요소는 원래 크기 유지 ----
+  function sizeOpenModal(){ /* 스케일 없음: 모든 탭/단계에서 동일 너비, 콘텐츠는 내부 스크롤로 더 많이 노출 */ }
+  window.sizeOpenModal=sizeOpenModal;
+
+  // ---- 매장 카테고리 관리 + 매핑 ----
+  var categories=[
+    {name:'F&B',color:'gray'},{name:'Lounge',color:'gold'},{name:'Bar',color:'gold'},
+    {name:'Cafe',color:'gray'},{name:'Art',color:'blue'},{name:'Fashion',color:'gold'},{name:'Bakery',color:'gray'}
+  ];
+  function catColor(name){var c=categories.filter(function(x){return x.name===name;})[0];return c?c.color:'gray';}
+  function catStoreCount(name){return stores.filter(function(s){return s.cat===name;}).length;}
+  function fillStoreCatFilter(){
+    var sel=document.getElementById('sqCat'); if(!sel) return;
+    var cur=sel.value;
+    sel.innerHTML='<option value="all">전체</option>'+categories.map(function(c){return '<option>'+c.name+'</option>';}).join('');
+    sel.value=(cur==='all'||categories.some(function(c){return c.name===cur;}))?cur:'all';
+  }
+  fillStoreCatFilter();
+
+  // ---- 콘텐츠 · 알림: 공지 목록 + 푸시 발송 ----
+  var cmsNotices=[
+    {title:"GL 신규 베이커리 '브레드랩' 오픈!",cat:'신규 매장',st:'게시',pin:true},
+    {title:'일부 매장 정기 휴무 안내',cat:'휴무',st:'게시',pin:false},
+    {title:'GL 라멘야시마 주말 영업시간 변경',cat:'안내',st:'예약',pin:false}
+  ];
+  var pushes=[
+    {title:'혜택 알림 · 부스팅 2배 적립',target:'전체 회원',reach:9200,st:'발송됨',when:''},
+    {title:'서비스 알림 · 점검 안내',target:'전체 회원',reach:0,st:'예약',when:'6/2 02:00'}
+  ];
+  var cmsStCls={'게시':'green','예약':'gray','임시저장':'gray','발송됨':'blue'};
+  function renderCmsNotices(){
+    document.getElementById('cmsNoticeList').innerHTML=cmsNotices.map(function(n){
+      return '<div class="feed-item"><div class="feed-bd"><b>'+(n.pin?'📌 ':'')+n.title+'</b><small>'+n.cat+'</small></div><span class="tag '+(cmsStCls[n.st]||'gray')+'">'+n.st+'</span></div>';
+    }).join('');
+    var el=document.getElementById('noticeCnt'); if(el) el.textContent='· '+cmsNotices.length+'건';
+  }
+  function renderPushes(){
+    document.getElementById('pushList').innerHTML=pushes.map(function(p){
+      var sub=p.st==='예약'?('예약 발송 '+p.when):(p.target+' · 도달 '+p.reach.toLocaleString('en-US'));
+      return '<div class="feed-item"><div class="feed-bd"><b>'+p.title+'</b><small>'+sub+'</small></div><span class="tag '+(cmsStCls[p.st]||'gray')+'">'+p.st+'</span></div>';
+    }).join('');
+  }
+  renderCmsNotices(); renderPushes();
+
+  function pushReachCount(t){
+    if(t==='all') return members.length;
+    if(t==='활성') return members.filter(function(m){return m.st==='활성';}).length;
+    if(t==='휴면') return members.filter(function(m){return m.st==='휴면';}).length;
+    if(t==='L') return members.filter(function(m){return m.c==='L-Class'||m.c==='H-Class';}).length;
+    if(t==='H') return members.filter(function(m){return m.c==='H-Class';}).length;
+    return 0;
+  }
+  function updateReach(){document.getElementById('pgReach').textContent=pushReachCount(document.getElementById('pgTarget').value).toLocaleString('en-US')+'명';}
+  window.closePush=function(){document.getElementById('pushModal').classList.remove('open');};
+  document.getElementById('openPush').addEventListener('click',function(){
+    document.getElementById('pgTitle').value=''; document.getElementById('pgBody').value='';
+    document.getElementById('pgTarget').value='all'; document.getElementById('pgLink').value='';
+    document.querySelector('input[name="pgWhen"][value="now"]').checked=true;
+    document.getElementById('pgSchedule').style.display='none'; document.getElementById('pgSchedule').value='';
+    document.getElementById('pgErr').textContent=''; updateReach();
+    document.getElementById('pushModal').classList.add('open');
+  });
+  document.getElementById('pgTarget').addEventListener('change',updateReach);
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="pgWhen"]'),function(r){r.addEventListener('change',function(){
+    document.getElementById('pgSchedule').style.display=document.querySelector('input[name="pgWhen"]:checked').value==='schedule'?'':'none';
+  });});
+  document.getElementById('pgSend').addEventListener('click',function(){
+    var err=document.getElementById('pgErr');
+    var title=document.getElementById('pgTitle').value.trim(), body=document.getElementById('pgBody').value.trim();
+    if(!title){ err.textContent='제목을 입력하세요.'; return; }
+    if(!body){ err.textContent='내용을 입력하세요.'; return; }
+    var when=document.querySelector('input[name="pgWhen"]:checked').value;
+    var tnames={all:'전체 회원','활성':'활성 회원','휴면':'휴면 회원',L:'L-Class 이상',H:'H-Class'};
+    var reach=pushReachCount(document.getElementById('pgTarget').value);
+    if(when==='schedule'){
+      var sch=document.getElementById('pgSchedule').value; if(!sch){ err.textContent='예약 일시를 선택하세요.'; return; }
+      pushes.unshift({title:title,target:tnames[document.getElementById('pgTarget').value],reach:0,st:'예약',when:sch.replace('T',' ').slice(5)});
+    } else {
+      pushes.unshift({title:title,target:tnames[document.getElementById('pgTarget').value],reach:reach,st:'발송됨',when:''});
+    }
+    renderPushes(); closePush();
+    alert(when==='schedule'?'푸시가 예약되었습니다.':'푸시가 발송되었습니다. (예상 도달 '+reach.toLocaleString('en-US')+'명)');
+  });
+
+  window.closeNotice=function(){document.getElementById('noticeModal').classList.remove('open');};
+  document.getElementById('openNotice').addEventListener('click',function(){
+    ['ntTitle','ntBody','ntFrom','ntTo'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('ntCat').value='공지'; document.getElementById('ntStatus').value='게시';
+    document.getElementById('ntPin').checked=false; document.getElementById('ntAlways').checked=false;
+    document.getElementById('ntErr').textContent='';
+    document.getElementById('noticeModal').classList.add('open');
+  });
+  document.getElementById('ntSave').addEventListener('click',function(){
+    var err=document.getElementById('ntErr');
+    var title=document.getElementById('ntTitle').value.trim(), body=document.getElementById('ntBody').value.trim();
+    if(!title){ err.textContent='제목을 입력하세요.'; return; }
+    if(!body){ err.textContent='내용을 입력하세요.'; return; }
+    cmsNotices.unshift({title:title,cat:document.getElementById('ntCat').value,st:document.getElementById('ntStatus').value,pin:document.getElementById('ntPin').checked});
+    cmsNotices.sort(function(a,b){return (b.pin?1:0)-(a.pin?1:0);});
+    renderCmsNotices(); closeNotice();
+    alert('공지가 저장되었습니다.');
+  });
+
+  // ---- 회원 상세: 골드 1개 → 목표 2개 (X1 다음 층 / X2 연간 등급) ----
+  function mmBar(pct,color){return '<div style="height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:9px 0 6px"><div style="height:100%;width:'+Math.max(3,Math.min(100,pct)).toFixed(0)+'%;background:'+color+';border-radius:99px"></div></div>';}
+  var CALC_DDAY=Math.ceil((new Date('2026-12-31')-new Date('2026-06-01'))/86400000);
+  window.closeMember=function(){document.getElementById('memberModal').classList.remove('open');};
+  function openMember(id){
+    var m=members.filter(function(x){return x.id===id;})[0]; if(!m) return;
+    document.getElementById('mmName').textContent=m.n;
+    document.getElementById('mmSub').textContent=m.id+' · 가입 '+m.d;
+    document.getElementById('mmBasic').innerHTML=
+      '<span>전화 <b>'+maskPhone(m.p)+'</b></span><span>생년월일 <b>'+fmtBirth(m.b)+'</b></span><span>성별 <b>'+m.gd+'</b></span><span>상태 <b>'+m.st+'</b></span><span>보유 쿠폰 <b>'+m.cp+'</b></span>';
+    document.getElementById('mmGold').innerHTML=
+      '<span class="mini">보유 골드 (미션 / 매장)</span><b class="gold-amt" style="font-size:18px">'+gfmt(gtot(m))+' G <span class="mini" style="font-weight:400">('+gfmt(m.mg)+' / '+gfmt(m.sg)+')</span></b>';
+    // X1 다음 층 목표
+    var idx=FIDX[m.f], je=journeyEnd(m.d), x1;
+    if(idx!=null && idx+1<gradeTiers.length){
+      var cur=gradeTiers[idx], nx=gradeTiers[idx+1], gj=Math.round(cur.thr+(nx.thr-cur.thr)*(m.prog||0)), remain=Math.max(0,nx.thr-gj);
+      x1='<div class="sec-title" style="margin-bottom:2px">① 다음 층 목표 <span class="tag blue" style="font-weight:600">X1</span></div>'+
+         '<p class="mini">현재 <b style="color:var(--ink)">'+m.f+'</b> → 다음 <b style="color:var(--ink)">'+nx.f+'</b></p>'+
+         mmBar((m.prog||0)*100,'#3E5C86')+
+         '<p class="mini">다음 층까지 <b class="gold-amt">'+gfmt(remain)+' G</b> 필요</p>'+
+         '<p class="mini" style="margin-top:8px">여정 종료 <b style="color:var(--ink)">'+je.label+'</b> (D-'+je.dday+')</p>'+
+         '<p class="mini" style="color:var(--ink3)">종료 시 1층부터 재시작 · 골드는 유지</p>';
+    } else {
+      x1='<div class="sec-title" style="margin-bottom:2px">① 다음 층 목표 <span class="tag blue" style="font-weight:600">X1</span></div>'+
+         '<p class="mini">현재 <b style="color:var(--ink)">'+m.f+'</b> · 최상위 층 도달</p>'+mmBar(100,'#3E5C86')+
+         '<p class="mini" style="margin-top:8px">여정 종료 <b style="color:var(--ink)">'+je.label+'</b> (D-'+je.dday+')</p>'+
+         '<p class="mini" style="color:var(--ink3)">종료 시 1층부터 재시작 · 골드는 유지</p>';
+    }
+    document.getElementById('mmX1').innerHTML=x1;
+    // X2 연간 등급 목표
+    var gy=m.gy||0, cc=classFromYear(gy), nc=nextClassThr(gy), pctC, remainC;
+    if(nc){ var curThr=cc[1]; pctC=(gy-curThr)/(nc[1]-curThr)*100; remainC=nc[1]-gy; } else { pctC=100; }
+    var x2='<div class="sec-title" style="margin-bottom:2px">② 올해 등급 목표 <span class="tag gold" style="font-weight:600">X2</span></div>'+
+      '<p class="mini">올해 누적 <b class="gold-amt">'+gfmt(gy)+' G</b> (1.1~현재)</p>'+
+      '<p class="mini">현재 적용 <span class="tag '+m.cc+'">'+m.c+'</span> · 내년 예상 <span class="tag '+cc[2]+'">'+cc[0]+'</span></p>'+
+      mmBar(pctC,'#A9803F')+
+      (nc?'<p class="mini">다음 등급('+nc[0]+')까지 <b class="gold-amt">'+gfmt(remainC)+' G</b></p>':'<p class="mini">최고 등급 도달</p>')+
+      '<p class="mini" style="margin-top:8px">등급 산정 <b style="color:var(--ink)">2026.12.31</b> (D-'+CALC_DDAY+') → 2027.1.1 적용</p>'+
+      '<p class="mini" style="color:var(--ink3)">집계만 · 골드 잔액은 차감되지 않음</p>';
+    document.getElementById('mmX2').innerHTML=x2;
+    document.getElementById('memberModal').classList.add('open');
+  }
+  document.getElementById('memberRows').addEventListener('click',function(e){
+    var b=e.target.closest('[data-mid]'); if(!b) return; openMember(b.dataset.mid);
+  });
+  var catEditIdx=-1;
+  function renderCatRows(){
+    document.getElementById('catRows').innerHTML=categories.map(function(c,i){
+      var cnt=catStoreCount(c.name);
+      if(i===catEditIdx){
+        return '<tr>'+
+          '<td><input id="catEName" class="finput" value="'+c.name.replace(/"/g,'&quot;')+'" style="width:160px"></td>'+
+          '<td><select id="catEColor" class="fsel" style="width:140px"><option value="gray"'+(c.color==='gray'?' selected':'')+'>기본(회색)</option><option value="blue"'+(c.color==='blue'?' selected':'')+'>파랑</option><option value="gold"'+(c.color==='gold'?' selected':'')+'>골드</option><option value="green"'+(c.color==='green'?' selected':'')+'>그린</option></select></td>'+
+          '<td class="num">'+cnt+'</td>'+
+          '<td style="text-align:right"><button class="btn primary catESave" data-i="'+i+'" style="padding:6px 12px;font-size:12px">저장</button> <button class="btn catECancel" style="padding:6px 12px;font-size:12px">취소</button></td></tr>';
+      }
+      return '<tr>'+
+        '<td><span class="tag '+c.color+'">'+c.name+'</span></td>'+
+        '<td class="mini">'+c.color+'</td>'+
+        '<td class="num">'+cnt+'</td>'+
+        '<td style="text-align:right"><button class="btn catEdit" data-i="'+i+'" style="padding:6px 12px;font-size:12px">수정</button> <button class="btn catDel" data-i="'+i+'" style="padding:6px 12px;font-size:12px">삭제</button></td></tr>';
+    }).join('');
+    document.getElementById('catCount').textContent='카테고리 '+categories.length+'종';
+  }
+  renderCatRows();
+  document.getElementById('catCreate').addEventListener('click',function(){
+    var err=document.getElementById('catErr');
+    var name=document.getElementById('catName').value.trim();
+    if(!name){ err.textContent='카테고리명을 입력하세요.'; return; }
+    if(categories.some(function(c){return c.name===name;})){ err.textContent='이미 존재하는 카테고리입니다.'; return; }
+    categories.push({name:name,color:document.getElementById('catColorSel').value});
+    document.getElementById('catName').value=''; err.textContent='';
+    renderCatRows(); fillStoreCatFilter();
+  });
+  document.getElementById('catAdd').addEventListener('click',function(){document.getElementById('catName').focus();});
+  document.getElementById('catRows').addEventListener('click',function(e){
+    var ed=e.target.closest('.catEdit'), dl=e.target.closest('.catDel'), sv=e.target.closest('.catESave'), cc=e.target.closest('.catECancel');
+    if(ed){ catEditIdx=+ed.dataset.i; renderCatRows(); }
+    else if(cc){ catEditIdx=-1; renderCatRows(); }
+    else if(sv){
+      var i=+sv.dataset.i, newName=document.getElementById('catEName').value.trim(), newColor=document.getElementById('catEColor').value;
+      if(!newName) return;
+      var old=categories[i].name;
+      categories[i]={name:newName,color:newColor};
+      stores.forEach(function(s){if(s.cat===old){s.cat=newName;s.cc=newColor;}}); // 매핑된 매장 동기화
+      catEditIdx=-1; renderCatRows(); pagerStore.draw(); fillStoreCatFilter();
+    }
+    else if(dl){
+      var i2=+dl.dataset.i, c=categories[i2];
+      if(catStoreCount(c.name)>0){ alert('연결된 매장이 있어 삭제할 수 없습니다. 먼저 매장의 카테고리를 변경하세요.'); return; }
+      if(!confirm('"'+c.name+'" 카테고리를 삭제할까요?')) return;
+      categories.splice(i2,1); renderCatRows(); fillStoreCatFilter();
+    }
+  });
+</script>
+</body>
+</html>
